@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -5,14 +6,29 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Platform,
+  KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
 export const RegistrationScreen = () => {
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
+  console.log(isShowKeyboard);
+  const keyBoardHiden = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={{ ...styles.container, marginBottom: isShowKeyboard ? -110 : 0 }}
+      behavior={Platform.OS == "ios" ? "padding" : null}
+    >
+      {/* <View style={styles.container}> */}
       <View style={styles.fotoField}></View>
 
       <Text style={styles.registerText}>Регистрация</Text>
@@ -26,26 +42,47 @@ export const RegistrationScreen = () => {
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
         placeholder="Логин"
+        onFocus={() => {
+          setIsShowKeyboard(true);
+        }}
       />
       <TextInput
         style={{ ...styles.inputFild, width: screenWidth - 32 }}
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
         placeholder="Адрес электронной почты"
+        onFocus={() => {
+          setIsShowKeyboard(true);
+        }}
       />
       <TextInput
         style={{ ...styles.inputFild, width: screenWidth - 32 }}
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
+        secureTextEntry={showPassword}
         placeholder="Пароль"
+        onFocus={() => {
+          setIsShowKeyboard(true);
+        }}
       />
-      <TouchableOpacity style={styles.btnPassInput}>
+      <TouchableOpacity
+        style={styles.btnPassInput}
+        onPress={() => {
+          setShowPassword(!showPassword);
+        }}
+      >
         <Text style={styles.btnPassInputText} width="100%">
-          Показать
+          {showPassword ? "Показать" : "Скрыть"}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={{ ...styles.btnRegister, width: screenWidth - 32 }}
+        style={{
+          ...styles.btnRegister,
+          marginTop: isShowKeyboard ? 0 : 27,
+          width: screenWidth - 32,
+        }}
+        activeOpacity={0.8}
+        onPress={keyBoardHiden}
       >
         <Text style={styles.btnRegisterText} width="100%">
           Зарегистрироваться
@@ -57,16 +94,19 @@ export const RegistrationScreen = () => {
           <Text style={styles.btnLoginText}>Войти</Text>
         </TouchableOpacity>
       </View>
-    </View>
+      {/* </View> */}
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
+
     position: "relative",
     alignItems: "center",
-    marginTop: 263,
+    paddingBottom: 78,
+    // marginBottom: 0,
     backgroundColor: "#fff",
     width: screenWidth,
 
@@ -131,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FF6C00",
-    marginTop: 27,
+    // marginTop: 27,
     borderRadius: 100,
     height: 51,
   },

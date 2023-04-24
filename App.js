@@ -6,6 +6,8 @@ import {
   View,
   TextInput,
   Dimensions,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 
 import { RegistrationScreen } from "./Screens/RegistrationScreen";
@@ -25,10 +27,11 @@ export default function App() {
         resizeMode="cover"
         style={styles.bgImage}
       >
-        {/* <Text>Hello world!</Text>
-        <Text>Open up App.js to start working on your app!</Text> */}
+        {/* <KeyboardAvoidingView
+          behavior={Platform.OS == "ios" ? "padding" : "height"}
+        > */}
         <RegistrationScreen />
-        {/* <TextInput style={styles.input} textAlign={"center"} /> */}
+        {/* </KeyboardAvoidingView> */}
         <StatusBar style="auto" />
       </ImageBackground>
     </View>
@@ -42,7 +45,7 @@ const styles = StyleSheet.create({
   },
   bgImage: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-end",
     alignItems: "center",
   },
 });
