@@ -16,6 +16,7 @@ const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
 export const RegistrationScreen = ({
+  dimensionM,
   keyBoardHiden,
   isShowKeyboard,
   setIsShowKeyboard,
@@ -24,7 +25,7 @@ export const RegistrationScreen = ({
   setShowScreen,
 }) => {
   const [showPassword, setShowPassword] = useState(true);
-
+  console.log("dimensionM -Register>>", dimensionM);
   return (
     <KeyboardAvoidingView
       style={{
