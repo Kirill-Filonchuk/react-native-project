@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
   View,
@@ -10,13 +10,14 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
-import Icon from "react-native-vector-icons/AntDesign";
+// import Icon from "react-native-vector-icons/AntDesign";
 // closecircleo;
-const screenHeight = Dimensions.get("window").height;
-const screenWidth = Dimensions.get("window").width;
+// const screenHeight = Dimensions.get("window").height;
+// const screenWidth = Dimensions.get("window").width;
+// const initialDimension = Dimensions.get("window").width;
 
 export const LoginScreen = ({
-  dimensionM,
+  // dimensionM,
   keyBoardHiden,
   isShowKeyboard,
   setIsShowKeyboard,
@@ -24,12 +25,26 @@ export const LoginScreen = ({
   stateLogin,
   setShowScreen,
 }) => {
+  const [dimensionL, setDimensionL] = useState(Dimensions.get("window").width);
   const [showPassword, setShowPassword] = useState(true);
-  console.log("dimensionM -Login>>", dimensionM);
+  // console.log("dimensionL -Login>>", dimensionL);
+
+  useEffect(() => {
+    const onChenge = () => {
+      const width = Dimensions.get("window").width;
+      setDimensionL(width);
+      console.log("width ->", width);
+    };
+    Dimensions.addEventListener("change", onChenge);
+    return () => {
+      Dimensions.removeEventListener("change", onChenge);
+    };
+  }, []);
   return (
     <KeyboardAvoidingView
       style={{
         ...styles.container,
+        width: dimensionL,
         marginBottom: isShowKeyboard ? -233 : null,
       }}
       behavior={Platform.OS == "ios" ? "padding" : null}
@@ -37,7 +52,7 @@ export const LoginScreen = ({
       <Text style={styles.registerText}>Войти</Text>
 
       <TextInput
-        style={{ ...styles.inputFild, width: screenWidth - 32 }}
+        style={{ ...styles.inputFild, width: dimensionL - 32 }}
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
         placeholder="Адрес электронной почты"
@@ -53,7 +68,7 @@ export const LoginScreen = ({
         style={{
           ...styles.inputFild,
           marginBottom: isShowKeyboard ? 32 : 16,
-          width: screenWidth - 32,
+          width: dimensionL - 32,
         }}
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
@@ -81,7 +96,7 @@ export const LoginScreen = ({
         style={{
           ...styles.btnRegister,
           marginTop: isShowKeyboard ? 0 : 27,
-          width: screenWidth - 32,
+          width: dimensionL - 32,
         }}
         activeOpacity={0.8}
         onPress={keyBoardHiden}
@@ -109,7 +124,7 @@ const styles = StyleSheet.create({
     paddingBottom: 144,
     marginBottom: 0,
     backgroundColor: "#fff",
-    width: screenWidth,
+    // width: screenWidth,
 
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,

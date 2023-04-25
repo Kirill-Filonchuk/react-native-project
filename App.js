@@ -31,10 +31,8 @@ const initialStateLogin = {
   password: "",
 };
 
-const initialDimension = Dimensions.get("window").width;
 export default function App() {
-  console.log("initialDimension", initialDimension);
-  const [dimensionM, setDimension] = useState(initialDimension);
+  // const [dimensionM, setDimension] = useState(Dimensions.get("window").width);
   const [showScreen, setShowScreen] = useState("register");
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [stateRegister, setStateRegister] = useState(initialStateReg);
@@ -49,19 +47,19 @@ export default function App() {
   // console.log(isShowKeyboard);
   // useEffect(() => {}, [setShowScreen, showScreen]);
 
-  useEffect(() => {
-    const onChenge = () => {
-      const width = Dimensions.get("window").width;
-      setDimension(width);
-      console.log("width ->", width);
-    };
-    Dimensions.addEventListener("change", onChenge);
-    return () => {
-      Dimensions.removeEventListener("change", onChenge);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const onChenge = () => {
+  //     const width = Dimensions.get("window").width;
+  //     setDimension(width);
+  //     console.log("width ->", width);
+  //   };
+  //   Dimensions.addEventListener("change", onChenge);
+  //   return () => {
+  //     Dimensions.removeEventListener("change", onChenge);
+  //   };
+  // }, []);
 
-  console.log("dimensionM ->>", dimensionM);
+  // console.log("dimensionM ->>", dimensionM);
 
   const keyBoardHiden = () => {
     setIsShowKeyboard(false);
@@ -97,7 +95,7 @@ export default function App() {
           {/* </KeyboardAvoidingView> */}
           {showScreen === "register" ? (
             <RegistrationScreen
-              dimensionM={dimensionM}
+              // dimensionM={dimensionM}
               keyBoardHiden={keyBoardHiden}
               isShowKeyboard={isShowKeyboard}
               setIsShowKeyboard={setIsShowKeyboard}
@@ -109,7 +107,7 @@ export default function App() {
           ) : null}
           {showScreen === "login" ? (
             <LoginScreen
-              dimensionM={dimensionM}
+              // dimensionM={dimensionM}
               keyBoardHiden={keyBoardHiden}
               isShowKeyboard={isShowKeyboard}
               setIsShowKeyboard={setIsShowKeyboard}

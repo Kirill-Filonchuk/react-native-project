@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
   View,
@@ -16,7 +16,7 @@ const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
 export const RegistrationScreen = ({
-  dimensionM,
+  // dimensionM,
   keyBoardHiden,
   isShowKeyboard,
   setIsShowKeyboard,
@@ -24,12 +24,26 @@ export const RegistrationScreen = ({
   stateRegister,
   setShowScreen,
 }) => {
+  const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [showPassword, setShowPassword] = useState(true);
-  console.log("dimensionM -Register>>", dimensionM);
+  console.log("dimensionR -Register>>", dimensionR);
+  useEffect(() => {
+    const onChenge = () => {
+      const width = Dimensions.get("window").width;
+      setDimensionR(width);
+      console.log("width ->", width);
+    };
+    Dimensions.addEventListener("change", onChenge);
+    return () => {
+      Dimensions.removeEventListener("change", onChenge);
+    };
+  }, []);
+
   return (
     <KeyboardAvoidingView
       style={{
         ...styles.container,
+        width: dimensionR,
         marginBottom: isShowKeyboard ? -110 : null,
       }}
       behavior={Platform.OS == "ios" ? "padding" : null}
@@ -42,7 +56,7 @@ export const RegistrationScreen = ({
         <Icon name="closecircleo" size={25} color="#BDBDBD" />
       </TouchableOpacity>
       <TextInput
-        style={{ ...styles.inputFild, width: screenWidth - 32 }}
+        style={{ ...styles.inputFild, width: dimensionR - 32 }}
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
         placeholder="Логин"
@@ -55,7 +69,7 @@ export const RegistrationScreen = ({
         }
       />
       <TextInput
-        style={{ ...styles.inputFild, width: screenWidth - 32 }}
+        style={{ ...styles.inputFild, width: dimensionR - 32 }}
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
         placeholder="Адрес электронной почты"
@@ -68,7 +82,7 @@ export const RegistrationScreen = ({
         }
       />
       <TextInput
-        style={{ ...styles.inputFild, width: screenWidth - 32 }}
+        style={{ ...styles.inputFild, width: dimensionR - 32 }}
         textAlign={"left"}
         inputContainerStyle={{ alignItems: "left" }}
         secureTextEntry={showPassword}
@@ -95,7 +109,7 @@ export const RegistrationScreen = ({
         style={{
           ...styles.btnRegister,
           marginTop: isShowKeyboard ? 0 : 27,
-          width: screenWidth - 32,
+          width: dimensionR - 32,
         }}
         activeOpacity={0.8}
         onPress={keyBoardHiden}
@@ -123,7 +137,7 @@ const styles = StyleSheet.create({
     paddingBottom: 78,
     marginBottom: 0,
     backgroundColor: "#fff",
-    width: screenWidth,
+    // width: dimensionR,
 
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
