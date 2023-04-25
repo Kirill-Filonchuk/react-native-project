@@ -1,40 +1,109 @@
 import { StatusBar } from "expo-status-bar";
+import { useState, useCallback, useEffect } from "react";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+
 import {
   ImageBackground,
   StyleSheet,
-  Text,
   View,
-  TextInput,
   Dimensions,
-  Platform,
-  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 
 import { RegistrationScreen } from "./Screens/RegistrationScreen";
-
+import { LoginScreen } from "./Screens/LoginScreen";
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 // width: screenWidth,
 // height: screenHeight,
 
 const bgImage = require("./assets/images/photoBg.jpg");
-require("./assets/images/photoBg.jpg");
+
+const initialStateReg = {
+  login: "",
+  email: "",
+  password: "",
+};
+const initialStateLogin = {
+  email: "",
+  password: "",
+};
+
 export default function App() {
+  const [showScreen, setShowScreen] = useState("register");
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const [stateRegister, setStateRegister] = useState(initialStateReg);
+  const [stateLogin, setStateLogin] = useState(initialStateLogin);
+
+  const [fontsLoaded] = useFonts({
+    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
+    "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
+  });
+
+  // console.log(isShowKeyboard);
+  // useEffect(() => {}, [setShowScreen, showScreen]);
+
+  const keyBoardHiden = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+    console.log(stateRegister);
+    console.log(stateLogin);
+    setStateRegister(initialStateReg);
+    setStateLogin(initialStateLogin);
+  };
+  console.log(showScreen);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={bgImage}
-        resizeMode="cover"
-        style={styles.bgImage}
-      >
-        {/* <KeyboardAvoidingView
+    <TouchableWithoutFeedback onPress={keyBoardHiden}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={bgImage}
+          resizeMode="cover"
+          style={styles.bgImage}
+        >
+          {/* <KeyboardAvoidingView
           behavior={Platform.OS == "ios" ? "padding" : "height"}
         > */}
-        <RegistrationScreen />
-        {/* </KeyboardAvoidingView> */}
-        <StatusBar style="auto" />
-      </ImageBackground>
-    </View>
+          {/* </KeyboardAvoidingView> */}
+          {showScreen === "register" ? (
+            <RegistrationScreen
+              keyBoardHiden={keyBoardHiden}
+              isShowKeyboard={isShowKeyboard}
+              setIsShowKeyboard={setIsShowKeyboard}
+              setStateRegister={setStateRegister}
+              stateRegister={stateRegister}
+              onLayout={onLayoutRootView}
+              setShowScreen={setShowScreen}
+            />
+          ) : null}
+          {showScreen === "login" ? (
+            <LoginScreen
+              keyBoardHiden={keyBoardHiden}
+              isShowKeyboard={isShowKeyboard}
+              setIsShowKeyboard={setIsShowKeyboard}
+              setStateLogin={setStateLogin}
+              stateLogin={stateLogin}
+              onLayout={onLayoutRootView}
+              setShowScreen={setShowScreen}
+            />
+          ) : null}
+          <StatusBar style="auto" />
+        </ImageBackground>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -46,6 +115,37 @@ const styles = StyleSheet.create({
   bgImage: {
     flex: 1,
     justifyContent: "flex-end",
-    alignItems: "center",
   },
 });
+
+// import AppLoading from "expo-app-loading";
+
+// const loadApplication = async () => {
+//   await Font.loadAsync({
+// "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
+// "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
+// "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
+//   });
+// };
+
+// if (!iasReady) {
+//   return (
+//     <AppLoading
+//       startAsync={loadApplication}
+//       onFinish={() => setIasReady(true)}
+//       onError={console.warn}
+//     />
+//   );
+// }
+// const togleScreen = (screenName) => {
+//   console.log("togle");
+//   if (screenName === "register") {
+//     setShowScreen("login");
+//     console.log("setShowScreen(login");
+//     return;
+//   } else {
+//     setShowScreen("register");
+//     console.log("setShowScreen(register");
+//   }
+//   return;
+// };

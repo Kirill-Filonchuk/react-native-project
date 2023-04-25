@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   View,
   StyleSheet,
@@ -8,34 +9,36 @@ import {
   Dimensions,
   Platform,
   KeyboardAvoidingView,
-  Keyboard,
 } from "react-native";
-
+import Icon from "react-native-vector-icons/AntDesign";
+// closecircleo;
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
-export const RegistrationScreen = () => {
-  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+export const RegistrationScreen = ({
+  keyBoardHiden,
+  isShowKeyboard,
+  setIsShowKeyboard,
+  setStateRegister,
+  stateRegister,
+  setShowScreen,
+}) => {
   const [showPassword, setShowPassword] = useState(true);
-  console.log(isShowKeyboard);
-  const keyBoardHiden = () => {
-    setIsShowKeyboard(false);
-    Keyboard.dismiss();
-  };
 
   return (
     <KeyboardAvoidingView
-      style={{ ...styles.container, marginBottom: isShowKeyboard ? -110 : 0 }}
+      style={{
+        ...styles.container,
+        marginBottom: isShowKeyboard ? -110 : null,
+      }}
       behavior={Platform.OS == "ios" ? "padding" : null}
     >
-      {/* <View style={styles.container}> */}
       <View style={styles.fotoField}></View>
 
       <Text style={styles.registerText}>Регистрация</Text>
       <TouchableOpacity style={styles.btnFotoInput}>
-        <Text style={styles.btnFotoInputText} width="100%">
-          +
-        </Text>
+        <Icon name="pluscircleo" size={25} color="#FF6C00" />
+        <Icon name="closecircleo" size={25} color="#BDBDBD" />
       </TouchableOpacity>
       <TextInput
         style={{ ...styles.inputFild, width: screenWidth - 32 }}
@@ -45,6 +48,10 @@ export const RegistrationScreen = () => {
         onFocus={() => {
           setIsShowKeyboard(true);
         }}
+        value={stateRegister.login}
+        onChangeText={(value) =>
+          setStateRegister((prevState) => ({ ...prevState, login: value }))
+        }
       />
       <TextInput
         style={{ ...styles.inputFild, width: screenWidth - 32 }}
@@ -54,6 +61,10 @@ export const RegistrationScreen = () => {
         onFocus={() => {
           setIsShowKeyboard(true);
         }}
+        value={stateRegister.email}
+        onChangeText={(value) =>
+          setStateRegister((prevState) => ({ ...prevState, email: value }))
+        }
       />
       <TextInput
         style={{ ...styles.inputFild, width: screenWidth - 32 }}
@@ -64,6 +75,10 @@ export const RegistrationScreen = () => {
         onFocus={() => {
           setIsShowKeyboard(true);
         }}
+        value={stateRegister.password}
+        onChangeText={(value) =>
+          setStateRegister((prevState) => ({ ...prevState, password: value }))
+        }
       />
       <TouchableOpacity
         style={styles.btnPassInput}
@@ -90,23 +105,22 @@ export const RegistrationScreen = () => {
       </TouchableOpacity>
       <View style={styles.textFooterWraper}>
         <Text style={styles.textMessage}>Уже есть аккаунт? </Text>
-        <TouchableOpacity style={styles.btnLogin}>
+        <TouchableOpacity
+          style={styles.btnLogin}
+          onPress={() => setShowScreen("login")}
+        >
           <Text style={styles.btnLoginText}>Войти</Text>
         </TouchableOpacity>
       </View>
-      {/* </View> */}
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-
-    position: "relative",
     alignItems: "center",
     paddingBottom: 78,
-    // marginBottom: 0,
+    marginBottom: 0,
     backgroundColor: "#fff",
     width: screenWidth,
 
@@ -115,7 +129,7 @@ const styles = StyleSheet.create({
   },
   fotoField: {
     position: "absolute",
-    top: -50,
+    top: -55,
     width: 120,
     height: 120,
     backgroundColor: "#F6F6F6",
@@ -124,30 +138,27 @@ const styles = StyleSheet.create({
   btnFotoInput: {
     position: "relative",
     right: -60,
-    top: -150,
+    top: -140,
     backgroundColor: "#fff",
-    borderColor: "#FF6C00",
-    borderStyle: "solid",
-    borderWidth: 1,
+    // borderColor: "#FF6C00",
+    // borderStyle: "solid",
+    // borderWidth: 1,
     width: 25,
     height: 25,
     borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
   },
-  btnFotoInputText: {
-    textAlign: "center",
-    color: "#FF6C00",
-    backgroundColor: "transparent",
-    fontSize: 16,
-  },
+
   registerText: {
     marginTop: 92,
     marginBottom: 33,
     color: "#212121",
-    fontSize: 42,
-    fontWeight: "bold",
+    fontSize: 30,
+    fontWeight: 500,
     textAlign: "center",
+    fontFamily: "Roboto-Bold",
+    letterSpacing: 1.16,
   },
   inputFild: {
     marginBottom: 16,
@@ -155,17 +166,21 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 8,
     backgroundColor: "#F6F6F6",
+    fontFamily: "Roboto-Regular",
+    letterSpacing: 1.16,
   },
   btnPassInput: {
     position: "absolute",
   },
   btnPassInputText: {
     position: "relative",
-    bottom: -353,
+    bottom: -335,
     left: 150,
     color: "#1B4371",
     fontSize: 16,
     fontWeight: 400,
+    fontFamily: "Roboto-Medium",
+    letterSpacing: 1.16,
   },
   btnRegister: {
     justifyContent: "center",
@@ -180,6 +195,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: 400,
+    fontFamily: "Roboto-Medium",
+    letterSpacing: 1.167,
   },
   textFooterWraper: {
     marginTop: 16,
@@ -188,15 +205,31 @@ const styles = StyleSheet.create({
     color: "#1B4371",
     fontSize: 16,
     fontWeight: 400,
+    fontFamily: "Roboto-Medium",
+    letterSpacing: 1.16,
   },
   textMessage: {
     color: "#1B4371",
     fontSize: 16,
     fontWeight: 400,
+    fontFamily: "Roboto-Medium",
+    letterSpacing: 1.16,
   },
   btnLoginText: {
     color: "#1B4371",
     fontSize: 16,
     fontWeight: 400,
+    fontFamily: "Roboto-Medium",
+    letterSpacing: 1.16,
   },
 });
+
+// import * as Svg from "react-native-svg";
+// import * as React from "react";
+// import Svg, { Circle, Rect } from "react-native-svg";
+// import IconXmark from "@/icons/IconXmark";
+// import Icon from "react-native-vector-icons/FontAwesome";
+// import Ionicons from "@expo/vector-icons/Ionicons";
+{
+  /* <Ionicons name="md-checkmark-circle" size={32} color="green" /> */
+}
