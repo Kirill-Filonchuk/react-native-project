@@ -1,5 +1,6 @@
 {
   "expo": {
+     "jsEngine": "hermes",
     "name": "react-native-project",
     "slug": "react-native-project",
     "version": "1.0.0",
@@ -15,9 +16,11 @@
       "**/*"
     ],
     "ios": {
+        "jsEngine": "jsc",
       "supportsTablet": true
     },
     "android": {
+        "jsEngine": "jsc",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
