@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import * as ImagePicker from "expo-image-picker";
 
 import {
   View,
@@ -6,14 +7,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Image,
   // Dimensions,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
-// closecircleo;
-// const screenHeight = Dimensions.get("window").height;
-// const screenWidth = Dimensions.get("window").width;
 
 export const RegistrationScreen = ({
   dimensionR,
@@ -24,20 +23,29 @@ export const RegistrationScreen = ({
   stateRegister,
   setShowScreen,
 }) => {
+  const [image, setImage] = useState(null);
   // const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [showPassword, setShowPassword] = useState(true);
-  // console.log("dimensionR -Register>>", dimensionR);
-  // useEffect(() => {
-  //   const onChenge = () => {
-  //     const width = Dimensions.get("window").width;
-  //     setDimensionR(width);
-  //     // console.log("width ->", width);
-  //   };
-  //   Dimensions.addEventListener("change", onChenge);
-  //   return () => {
-  //     Dimensions.removeEventListener("change", onChenge);
-  //   };
-  // }, []);
+
+  const delPickImage = () => {
+    setImage(null);
+  };
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -48,13 +56,30 @@ export const RegistrationScreen = ({
       }}
       behavior={Platform.OS == "ios" ? "padding" : null}
     >
-      <View style={styles.fotoField}></View>
+      <View style={styles.fotoField}>
+        {image && <Image source={{ uri: image }} style={styles.imgInput} />}
+      </View>
 
       <Text style={styles.registerText}>Регистрация</Text>
-      <TouchableOpacity style={styles.btnFotoInput}>
-        <Icon name="pluscircleo" size={25} color="#FF6C00" />
-        <Icon name="closecircleo" size={25} color="#BDBDBD" />
-      </TouchableOpacity>
+
+      {!image ? (
+        <TouchableOpacity
+          title="Pick an image from camera roll"
+          onPress={pickImage}
+          style={styles.btnFotoInput}
+        >
+          <Icon name="pluscircleo" size={25} color="#FF6C00" />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          title="Pick an image from camera roll"
+          onPress={delPickImage}
+          style={styles.btnFotoInput}
+        >
+          <Icon name="closecircleo" size={25} color="#BDBDBD" />
+        </TouchableOpacity>
+      )}
+
       <TextInput
         style={{ ...styles.inputFild, width: dimensionR - 32 }}
         textAlign={"left"}
@@ -148,6 +173,11 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     backgroundColor: "#F6F6F6",
+    borderRadius: 16,
+  },
+  imgInput: {
+    width: 120,
+    height: 120,
     borderRadius: 16,
   },
   btnFotoInput: {
@@ -248,3 +278,19 @@ const styles = StyleSheet.create({
 {
   /* <Ionicons name="md-checkmark-circle" size={32} color="green" /> */
 }
+// console.log("dimensionR -Register>>", dimensionR);
+// useEffect(() => {
+//   const onChenge = () => {
+//     const width = Dimensions.get("window").width;
+//     setDimensionR(width);
+//     // console.log("width ->", width);
+//   };
+//   Dimensions.addEventListener("change", onChenge);
+//   return () => {
+//     Dimensions.removeEventListener("change", onChenge);
+//   };
+// }, []);
+
+// closecircleo;
+// const screenHeight = Dimensions.get("window").height;
+// const screenWidth = Dimensions.get("window").width;
