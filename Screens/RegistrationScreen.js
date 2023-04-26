@@ -6,17 +6,17 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Dimensions,
+  // Dimensions,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
 // closecircleo;
-const screenHeight = Dimensions.get("window").height;
-const screenWidth = Dimensions.get("window").width;
+// const screenHeight = Dimensions.get("window").height;
+// const screenWidth = Dimensions.get("window").width;
 
 export const RegistrationScreen = ({
-  // dimensionM,
+  dimensionR,
   keyBoardHiden,
   isShowKeyboard,
   setIsShowKeyboard,
@@ -24,20 +24,20 @@ export const RegistrationScreen = ({
   stateRegister,
   setShowScreen,
 }) => {
-  const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
+  // const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [showPassword, setShowPassword] = useState(true);
-  console.log("dimensionR -Register>>", dimensionR);
-  useEffect(() => {
-    const onChenge = () => {
-      const width = Dimensions.get("window").width;
-      setDimensionR(width);
-      console.log("width ->", width);
-    };
-    Dimensions.addEventListener("change", onChenge);
-    return () => {
-      Dimensions.removeEventListener("change", onChenge);
-    };
-  }, []);
+  // console.log("dimensionR -Register>>", dimensionR);
+  // useEffect(() => {
+  //   const onChenge = () => {
+  //     const width = Dimensions.get("window").width;
+  //     setDimensionR(width);
+  //     // console.log("width ->", width);
+  //   };
+  //   Dimensions.addEventListener("change", onChenge);
+  //   return () => {
+  //     Dimensions.removeEventListener("change", onChenge);
+  //   };
+  // }, []);
 
   return (
     <KeyboardAvoidingView

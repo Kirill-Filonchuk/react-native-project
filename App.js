@@ -32,7 +32,7 @@ const initialStateLogin = {
 };
 
 export default function App() {
-  // const [dimensionM, setDimension] = useState(Dimensions.get("window").width);
+  const [dimensionM, setDimension] = useState(Dimensions.get("window").width);
   const [showScreen, setShowScreen] = useState("register");
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [stateRegister, setStateRegister] = useState(initialStateReg);
@@ -47,17 +47,17 @@ export default function App() {
   // console.log(isShowKeyboard);
   // useEffect(() => {}, [setShowScreen, showScreen]);
 
-  // useEffect(() => {
-  //   const onChenge = () => {
-  //     const width = Dimensions.get("window").width;
-  //     setDimension(width);
-  //     console.log("width ->", width);
-  //   };
-  //   Dimensions.addEventListener("change", onChenge);
-  //   return () => {
-  //     Dimensions.removeEventListener("change", onChenge);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const onChenge = () => {
+      const width = Dimensions.get("window").width;
+      setDimension(width);
+      console.log("width ->", width);
+    };
+    Dimensions.addEventListener("change", onChenge);
+    return () => {
+      Dimensions.removeEventListener("change", onChenge);
+    };
+  }, []);
 
   // console.log("dimensionM ->>", dimensionM);
 
@@ -95,7 +95,7 @@ export default function App() {
           {/* </KeyboardAvoidingView> */}
           {showScreen === "register" ? (
             <RegistrationScreen
-              // dimensionM={dimensionM}
+              dimensionR={dimensionM}
               keyBoardHiden={keyBoardHiden}
               isShowKeyboard={isShowKeyboard}
               setIsShowKeyboard={setIsShowKeyboard}
@@ -107,7 +107,7 @@ export default function App() {
           ) : null}
           {showScreen === "login" ? (
             <LoginScreen
-              // dimensionM={dimensionM}
+              dimensionL={dimensionM}
               keyBoardHiden={keyBoardHiden}
               isShowKeyboard={isShowKeyboard}
               setIsShowKeyboard={setIsShowKeyboard}

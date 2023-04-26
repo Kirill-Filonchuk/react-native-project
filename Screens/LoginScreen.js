@@ -6,7 +6,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Dimensions,
+  // Dimensions,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
@@ -17,7 +17,7 @@ import {
 // const initialDimension = Dimensions.get("window").width;
 
 export const LoginScreen = ({
-  // dimensionM,
+  dimensionL,
   keyBoardHiden,
   isShowKeyboard,
   setIsShowKeyboard,
@@ -25,21 +25,21 @@ export const LoginScreen = ({
   stateLogin,
   setShowScreen,
 }) => {
-  const [dimensionL, setDimensionL] = useState(Dimensions.get("window").width);
+  // const [dimensionL, setDimensionL] = useState(Dimensions.get("window").width);
   const [showPassword, setShowPassword] = useState(true);
   // console.log("dimensionL -Login>>", dimensionL);
 
-  useEffect(() => {
-    const onChenge = () => {
-      const width = Dimensions.get("window").width;
-      setDimensionL(width);
-      console.log("width ->", width);
-    };
-    Dimensions.addEventListener("change", onChenge);
-    return () => {
-      Dimensions.removeEventListener("change", onChenge);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const onChenge = () => {
+  //     const width = Dimensions.get("window").width;
+  //     setDimensionL(width);
+  //     // console.log("width ->", width);
+  //   };
+  //   Dimensions.addEventListener("change", onChenge);
+  //   return () => {
+  //     Dimensions.removeEventListener("change", onChenge);
+  //   };
+  // }, []);
   return (
     <KeyboardAvoidingView
       style={{
