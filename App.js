@@ -2,7 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { useState, useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { NavigationContainer } from "@react-navigation/native";
 
+import { useRoute } from "./router";
 import {
   ImageBackground,
   StyleSheet,
@@ -12,31 +14,30 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-import { RegistrationScreen } from "./Screens/RegistrationScreen";
-import { LoginScreen } from "./Screens/LoginScreen";
-const screenHeight = Dimensions.get("window").height;
-const screenWidth = Dimensions.get("window").width;
+// const screenHeight = Dimensions.get("window").height;
+// const screenWidth = Dimensions.get("window").width;
 // width: screenWidth,
 // height: screenHeight,
 
-const bgImage = require("./assets/images/photoBg.jpg");
+// const bgImage = require("./assets/images/photoBg.jpg");
 
-const initialStateReg = {
-  login: "",
-  email: "",
-  password: "",
-};
-const initialStateLogin = {
-  email: "",
-  password: "",
-};
+// const initialStateReg = {
+//   login: "",
+//   email: "",
+//   password: "",
+// };
+// const initialStateLogin = {
+//   email: "",
+//   password: "",
+// };
 
 export default function App() {
-  const [dimensionM, setDimension] = useState(Dimensions.get("window").width);
-  const [showScreen, setShowScreen] = useState("register");
-  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
-  const [stateRegister, setStateRegister] = useState(initialStateReg);
-  const [stateLogin, setStateLogin] = useState(initialStateLogin);
+  const routing = useRoute({});
+  // const [dimensionM, setDimension] = useState(Dimensions.get("window").width);
+  // const [showScreen, setShowScreen] = useState("register");
+  // const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  // const [stateRegister, setStateRegister] = useState(initialStateReg);
+  // const [stateLogin, setStateLogin] = useState(initialStateLogin);
 
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
@@ -47,29 +48,29 @@ export default function App() {
   // console.log(isShowKeyboard);
   // useEffect(() => {}, [setShowScreen, showScreen]);
 
-  useEffect(() => {
-    const onChenge = () => {
-      const width = Dimensions.get("window").width;
-      setDimension(width);
-      console.log("width ->", width);
-    };
-    Dimensions.addEventListener("change", onChenge);
-    return () => {
-      Dimensions.removeEventListener("change", onChenge);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const onChenge = () => {
+  //     const width = Dimensions.get("window").width;
+  //     setDimension(width);
+  //     console.log("width ->", width);
+  //   };
+  //   Dimensions.addEventListener("change", onChenge);
+  //   return () => {
+  //     Dimensions.removeEventListener("change", onChenge);
+  //   };
+  // }, []);
 
   // console.log("dimensionM ->>", dimensionM);
 
-  const keyBoardHiden = () => {
-    setIsShowKeyboard(false);
-    Keyboard.dismiss();
-    console.log(stateRegister);
-    console.log(stateLogin);
-    setStateRegister(initialStateReg);
-    setStateLogin(initialStateLogin);
-  };
-  console.log(showScreen);
+  // const keyBoardHiden = () => {
+  //   setIsShowKeyboard(false);
+  //   Keyboard.dismiss();
+  //   console.log(stateRegister);
+  //   console.log(stateLogin);
+  //   setStateRegister(initialStateReg);
+  //   setStateLogin(initialStateLogin);
+  // };
+  // console.log(showScreen);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -82,57 +83,39 @@ export default function App() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={keyBoardHiden}>
-      <View style={styles.container}>
-        <ImageBackground
-          source={bgImage}
-          resizeMode="cover"
-          style={styles.bgImage}
-        >
-          {/* <KeyboardAvoidingView
-          behavior={Platform.OS == "ios" ? "padding" : "height"}
-        > */}
-          {/* </KeyboardAvoidingView> */}
-          {showScreen === "register" ? (
-            <RegistrationScreen
-              dimensionR={dimensionM}
-              keyBoardHiden={keyBoardHiden}
-              isShowKeyboard={isShowKeyboard}
-              setIsShowKeyboard={setIsShowKeyboard}
-              setStateRegister={setStateRegister}
-              stateRegister={stateRegister}
-              onLayout={onLayoutRootView}
-              setShowScreen={setShowScreen}
-            />
-          ) : null}
-          {showScreen === "login" ? (
-            <LoginScreen
-              dimensionL={dimensionM}
-              keyBoardHiden={keyBoardHiden}
-              isShowKeyboard={isShowKeyboard}
-              setIsShowKeyboard={setIsShowKeyboard}
-              setStateLogin={setStateLogin}
-              stateLogin={stateLogin}
-              onLayout={onLayoutRootView}
-              setShowScreen={setShowScreen}
-            />
-          ) : null}
-          <StatusBar style="auto" />
-        </ImageBackground>
-      </View>
-    </TouchableWithoutFeedback>
+    <NavigationContainer>{routing}</NavigationContainer>
+
+    // <StatusBar style="auto" />
   );
 }
 
+// AUTH ************
+//  <AuthStack.Navigator initialRouteName="Registration">
+//    <AuthStack.Screen
+//      name="Registration"
+//      component={RegistrationScreen}
+//      options={{
+//        headerShown: true,
+//        title: "Registration screen",
+//      }}
+//    />
+//    <AuthStack.Screen
+//      name="Login"
+//      component={LoginScreen}
+//      options={{ headerShown: true, title: "Login screen" }}
+//    />
+//    {/* <MainStack.Screen name="Home" component={Home} /> */}
+//  </AuthStack.Navigator>;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1, //all space of screen
-    backgroundColor: "#fff",
-  },
-  bgImage: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
+  // container: {
+  //   flex: 1, //all space of screen
+  //   backgroundColor: "#fff",
+  // },
+  // bgImage: {
+  //   flex: 1,
+  //   justifyContent: "flex-end",
+  // },
 });
 
 // import AppLoading from "expo-app-loading";
