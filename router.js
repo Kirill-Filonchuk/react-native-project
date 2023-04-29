@@ -77,7 +77,10 @@ export const useRoute = (isAuth) => {
   // <AntDesign name="pluscircle" size={24} color="black" />;
   // <AntDesign name="pluscircleo" size={24} color="black" />;
   return (
-    <MainTab.Navigator screenOptions={screenOptions} initialRouteName="Profile">
+    <MainTab.Navigator
+      screenOptions={screenOptions}
+      initialRouteName="CreatePosts"
+    >
       <MainTab.Screen
         name="Home -> PostsScreen"
         // В хедере на экране PostsScreen добавить иконку для logout
