@@ -83,9 +83,11 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>{routing}</NavigationContainer>
+    <>
+      <NavigationContainer>{routing}</NavigationContainer>
 
-    // <StatusBar style="auto" />
+      {/* <StatusBar style="auto" /> */}
+    </>
   );
 }
 

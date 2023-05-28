@@ -232,12 +232,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  button: {
-    width: 70,
-    height: 40,
-    borderRadius: 35,
-    backgroundColor: "blue",
-  },
+  // button: {
+  //   width: 70,
+  //   height: 40,
+  //   borderRadius: 35,
+  //   backgroundColor: "blue",
+  // },
 });
 
 // options={{
