@@ -26,18 +26,18 @@ import {
 
 import { RegistrationScreen } from "./screens/auth/RegistrationScreen";
 import { LoginScreen } from "./screens/auth/LoginScreen";
-import { PostsScreen } from "./screens/mainScreens/PostsScreen";
+// import { PostsScreen } from "./screens/mainScreens/PostsScreen";
 import { ProfileScreen } from "./screens/mainScreens/ProfileScreen";
 import { CreatePostsScreen } from "./screens/mainScreens/CreatePostsScreen";
 import { Home } from "./screens/mainScreens/Home";
 
-const CustomButton = ({ onPress }) => {
-  <TouchableOpacity style={styles.profile} onPress={onPress}>
-    <View style={styles.batton}>
-      <AntDesign name="pluscircle" size="25" color="#FF6C00" />;
-    </View>
-  </TouchableOpacity>;
-};
+// const CustomButton = ({ onPress }) => {
+//   <TouchableOpacity style={styles.profile} onPress={onPress}>
+//     <View style={styles.button}>
+//       <AntDesign name="pluscircle" size="25" color="#FF6C00" />
+//     </View>
+//   </TouchableOpacity>;
+// };
 
 const screenOptions = {
   tabBarShowLabel: false,
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  batton: {
+  button: {
     width: 70,
     height: 40,
     borderRadius: 35,
