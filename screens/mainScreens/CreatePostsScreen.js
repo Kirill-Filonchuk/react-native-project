@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Camera } from "expo-camera";
+import * as Location from "expo-location";
+
 import {
   View,
   TouchableOpacity,
@@ -8,7 +11,6 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import { Camera } from "expo-camera";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 
 const dim = Dimensions.get("window").width;
@@ -19,21 +21,53 @@ const initialStateForm = {
 
 export const CreatePostsScreen = ({ navigation }) => {
   const [cameraRef, setCameraRef] = useState(null); //in video ->setSnap
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [namePlace, setNamePlace] = useState(initialStateForm.namePlace);
   const [toggle, setToggle] = useState(false);
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        console.log("Permission to access location was denied");
+        setLocation(errorMsg);
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+      console.log("location ->>>>", location);
+    })();
+  }, [photo]);
+
+  // let text = "Waiting..";
+  // if (errorMsg) {
+  //   text = errorMsg;
+  // } else if (location) {
+  //   text = JSON.stringify(location);
+  //   console.log("text LOCATION", text);
+  // }
+
+  console.log("location EseEff", location);
+
   const takePhoto = async () => {
+    // await Permissions.askAsync(Permissions.LOCATION);
     const photo = await cameraRef.takePictureAsync();
     console.log("cameraRef URI ->", photo.uri); //takePictureAsync() - take ref to our photo
     setPhoto(photo.uri);
     setToggle(!toggle);
+    // let location = await Location.getCurrentPositionAsync({});
+    // setLocation(location);
+    // console.log("location ->>>>", location);
     console.log("navigation", navigation);
   };
 
   const toPublish = () => {
     console.log("toPublish->navigation", navigation);
-    navigation.navigate("Home -> PostsScreen", { photo, namePlace });
+    // in first point the Component and second - object with data that we transmit to another Component
+    navigation.navigate("Home -> PostsScreen", { photo, namePlace, location });
     console.log("{ photo, namePlace }", { photo, namePlace });
     setNamePlace("");
   };
@@ -240,3 +274,23 @@ const styles = StyleSheet.create({
 //   // borderStyle: "solid",
 //   // borderWidth: 1,
 // },
+
+// const { status } = await Location.requestBackgroundPermissionsAsync();
+// if (status === "granted") {
+//   const startLoc = await Location.startLocationUpdatesAsync(
+//     LOCATION_TASK_NAME,
+//     {
+//       accuracy: Location.Accuracy.BestForNavigation,
+//       timeInterval: 3000,
+//       foregroundService: {
+//         notificationTitle: "BackgroundLocation Is On",
+//         notificationBody: "We are tracking your location",
+//         notificationColor: "#ffce52",
+//       },
+//     }
+//   );
+//   console.log("status", startLoc);
+// }
+// Location.getForegroundPermission;
+// const location = await Location.getLastKnownPositionAsync();
+// console.log("location", location);

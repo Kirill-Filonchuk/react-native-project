@@ -3,10 +3,10 @@ import { View, Text, StyleSheet } from "react-native";
 import { PostsScreen } from "./PostsScreen";
 
 export const Home = ({ route }) => {
-  console.log(route.params, "route.params");
+  // console.log(route.params, "route.params");
   return (
     <View style={styles.containerP}>
-      <PostsScreen />
+      <PostsScreen route={route.params} />
     </View>
   );
 };
