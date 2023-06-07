@@ -67,7 +67,7 @@ export const CreatePostsScreen = ({ navigation }) => {
   const toPublish = () => {
     console.log("toPublish->navigation", navigation);
     // in first point the Component and second - object with data that we transmit to another Component
-    navigation.navigate("PostsScreen", {
+    navigation.navigate("DefaultScreen", {
       photo: photo,
       namePlace: namePlace,
       location: location,

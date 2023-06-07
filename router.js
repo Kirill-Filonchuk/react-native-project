@@ -29,7 +29,6 @@ import { LoginScreen } from "./screens/auth/LoginScreen";
 import { PostsScreen } from "./screens/mainScreens/PostsScreen";
 import { ProfileScreen } from "./screens/mainScreens/ProfileScreen";
 import { CreatePostsScreen } from "./screens/mainScreens/CreatePostsScreen";
-// import { Home } from "./screens/mainScreens/Home";
 
 // const CustomButton = ({ onPress }) => {
 //   <TouchableOpacity style={styles.profile} onPress={onPress}>
