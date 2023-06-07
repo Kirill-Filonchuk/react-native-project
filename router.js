@@ -26,10 +26,10 @@ import {
 
 import { RegistrationScreen } from "./screens/auth/RegistrationScreen";
 import { LoginScreen } from "./screens/auth/LoginScreen";
-// import { PostsScreen } from "./screens/mainScreens/PostsScreen";
+import { PostsScreen } from "./screens/mainScreens/PostsScreen";
 import { ProfileScreen } from "./screens/mainScreens/ProfileScreen";
 import { CreatePostsScreen } from "./screens/mainScreens/CreatePostsScreen";
-import { Home } from "./screens/mainScreens/Home";
+// import { Home } from "./screens/mainScreens/Home";
 
 // const CustomButton = ({ onPress }) => {
 //   <TouchableOpacity style={styles.profile} onPress={onPress}>
@@ -82,9 +82,11 @@ export const useRoute = (isAuth) => {
       initialRouteName="CreatePosts"
     >
       <MainTab.Screen
-        name="Home -> PostsScreen"
+        name="PostsScreen"
+        PostsScreen
         // В хедере на экране PostsScreen добавить иконку для logout
-        component={Home}
+        // component={Home}
+        component={PostsScreen}
         options={{
           tabBarIcon: ({ focused }) => {
             return (

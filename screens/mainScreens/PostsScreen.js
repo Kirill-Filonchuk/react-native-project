@@ -1,6 +1,13 @@
 // import React, { createFactory } from "react";
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 // route catch all data that come in to the Component
 
 const Item = ({ photo, title, loc }) => (
@@ -10,16 +17,21 @@ const Item = ({ photo, title, loc }) => (
     <Text style={styles.title}>
       {loc.coords.latitude} * and * {loc.coords.longitude}
     </Text>
+    {/* <TouchableOpacity style={{}} activeOpacity={0.8} onPress={toComments}>
+      <Text style={{}}>*C*</Text>
+    </TouchableOpacity> */}
   </View>
 );
 export const PostsScreen = ({ route }) => {
+  console.log(route.params, "route.params");
+  console.log("route.params", { route });
   const [posts, setPosts] = useState([]);
   useEffect(() => {
-    if (route) {
-      setPosts((prevState) => [...prevState, route]);
+    if (route.params) {
+      setPosts((prevState) => [...prevState, route.params]);
     }
-  }, [route]);
-  // console.log("route.params", { route });
+  }, [route.params]);
+  console.log("route.params", { route });
   const renderItem = ({ item }) => (
     <Item title={item.namePlace} photo={item.photo} loc={item.location} />
   );
@@ -35,6 +47,12 @@ export const PostsScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  // containerP: {
+  //   flex: 1, //all space of screen
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   backgroundColor: "#fff",
+  // },
   containerP: {
     flex: 1, //all space of screen
     justifyContent: "center",
