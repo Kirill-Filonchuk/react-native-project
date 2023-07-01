@@ -35,12 +35,12 @@ export const RegistrationScreen = ({ navigation }) => {
 
   console.log("dimensionR -Register>>", dimensionR);
   useEffect(() => {
-    const onChenge = () => {
+    const onChange = () => {
       const width = Dimensions.get("window").width;
       setDimensionR(width);
       // console.log("width ->", width);
     };
-    dimensionsHandler = Dimensions.addEventListener("change", onChenge);
+    dimensionsHandler = Dimensions.addEventListener("change", onChange);
     return () => dimensionsHandler.remove();
   }, []);
 
@@ -343,14 +343,14 @@ const styles = StyleSheet.create({
 }
 // console.log("dimensionR -Register>>", dimensionR);
 // useEffect(() => {
-//   const onChenge = () => {
+//   const onChange = () => {
 //     const width = Dimensions.get("window").width;
 //     setDimensionR(width);
 //     // console.log("width ->", width);
 //   };
-//   Dimensions.addEventListener("change", onChenge);
+//   Dimensions.addEventListener("change", onChange);
 //   return () => {
-//     Dimensions.removeEventListener("change", onChenge);
+//     Dimensions.removeEventListener("change", onChange);
 //   };
 // }, []);
 

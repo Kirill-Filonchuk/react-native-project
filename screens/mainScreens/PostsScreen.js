@@ -4,7 +4,13 @@ import { MapScreen } from "../nestedScreens/MapScreen";
 import { CommentsScreen } from "../nestedScreens/CommentsScreen";
 const NestedScreen = createStackNavigator();
 
-export const PostsScreen = () => {
+export const PostsScreen = ({ navigation, route }) => {
+  // console.log("route.state ->PostsScreen", route.state);
+  // if (route.state && route.state.index > 0) {
+  //   navigation.setOptions({ tabBarStyle: { display: "none" } });
+  // } else {
+  //   navigation.setOptions({ tabBarStyle: true });
+  // }
   return (
     <NestedScreen.Navigator>
       <NestedScreen.Screen

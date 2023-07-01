@@ -8,21 +8,7 @@ const MainTab = createBottomTabNavigator();
 
 import { Feather, AntDesign } from "@expo/vector-icons";
 
-import {
-  ImageBackground,
-  View,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-  Platform,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Button,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 import { RegistrationScreen } from "./screens/auth/RegistrationScreen";
 import { LoginScreen } from "./screens/auth/LoginScreen";

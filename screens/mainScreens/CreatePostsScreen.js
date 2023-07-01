@@ -1,32 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
+import * as ImagePicker from "expo-image-picker";
 
 import {
   View,
   TouchableOpacity,
+  Pressable,
   Image,
   Text,
   TextInput,
   StyleSheet,
   Dimensions,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 
-const dim = Dimensions.get("window").width;
+// const dim = Dimensions.get("window").width;
 
 const initialStateForm = {
+  photo: null,
   namePlace: "",
+  locationPlace: null,
+  location: null,
+  cameraRef: null,
 };
 
 export const CreatePostsScreen = ({ navigation }) => {
-  const [cameraRef, setCameraRef] = useState(null); //in video ->setSnap
-  const [location, setLocation] = useState(null);
+  const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
+  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const [cameraRef, setCameraRef] = useState(initialStateForm.cameraRef); //in video ->setSnap
+  const [location, setLocation] = useState(initialStateForm.location);
+  const [locationPlace, setLocationPlace] = useState(
+    initialStateForm.locationPlace
+  );
   const [errorMsg, setErrorMsg] = useState(null);
-  const [photo, setPhoto] = useState(null);
+  const [photo, setPhoto] = useState(initialStateForm.photo);
   const [namePlace, setNamePlace] = useState(initialStateForm.namePlace);
   const [toggle, setToggle] = useState(false);
 
+  // console.log("dimensionR -CreatePostsScreen>>", dimensionR);
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -38,19 +54,40 @@ export const CreatePostsScreen = ({ navigation }) => {
       }
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
-      console.log("location ->>>>", location);
+      // console.log("location ->>>>", location);
     })();
   }, [photo]);
 
-  // let text = "Waiting..";
-  // if (errorMsg) {
-  //   text = errorMsg;
-  // } else if (location) {
-  //   text = JSON.stringify(location);
-  //   console.log("text LOCATION", text);
-  // }
+  useEffect(() => {
+    const onChange = () => {
+      const width = Dimensions.get("window").width;
+      setDimensionR(width);
+    };
+    dimensionsHandler = Dimensions.addEventListener("change", onChange);
+    return () => dimensionsHandler.remove();
+  }, []);
 
-  console.log("location EseEff", location);
+  const keyBoardHiden = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+  };
+  // console.log("location EseEff", location);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    // console.log(result);
+
+    if (!result.canceled) {
+      setPhoto(result.assets[0].uri);
+      setToggle(!toggle);
+    }
+  };
 
   const takePhoto = async () => {
     // await Permissions.askAsync(Permissions.LOCATION);
@@ -61,82 +98,137 @@ export const CreatePostsScreen = ({ navigation }) => {
     // let location = await Location.getCurrentPositionAsync({});
     // setLocation(location);
     // console.log("location ->>>>", location);
-    console.log("navigation", navigation);
+    // console.log("navigation", navigation);
   };
 
   const toPublish = () => {
-    console.log("toPublish->navigation", navigation);
+    // namePlace = namePlace ? namePlace : "No name";
+    console.log("NamePlace ->>>", namePlace);
+
+    // console.log("toPublish->navigation", navigation);
     // in first point the Component and second - object with data that we transmit to another Component
     navigation.navigate("DefaultScreen", {
       photo: photo,
       namePlace: namePlace,
       location: location,
+      locationPlace: locationPlace,
     });
-    console.log("!!!----{ photo, namePlace }", { photo, namePlace, location });
-    setNamePlace("");
+    // console.log("!!!----{ photo, namePlace }", { photo, namePlace, location });
+    resetState();
+    // setNamePlace("");
+    // setLocationPlace("");
   };
 
+  function resetState() {
+    const { photo, namePlace, locationPlace, location, cameraRef } =
+      initialStateForm;
+    setPhoto(photo);
+    setNamePlace(namePlace);
+    setLocationPlace(locationPlace);
+    setLocation(location);
+    setCameraRef(cameraRef);
+  }
+
   return (
-    <View style={styles.screenContainer}>
-      <View style={styles.containerP}>
-        <Camera style={styles.camera} ref={(ref) => setCameraRef(ref)}>
-          {photo && (
-            <View style={styles.cameraContainer}>
-              <Image
-                source={{ uri: photo }}
-                style={{ height: "100%", width: "100%" }}
-              />
-            </View>
-          )}
-          <TouchableOpacity
-            // style={styles.btnLogin}
-            onPress={takePhoto}
-          >
-            <View style={styles.snapContainer}>
-              <FontAwesome name="camera" size={24} color="#BDBDBD" />
-            </View>
-          </TouchableOpacity>
-        </Camera>
-      </View>
-      <View style={styles.editPhoto}>
-        <Text style={{ color: "#BDBDBD" }}>
-          {toggle ? "Редактировать фото" : "Загрузите фото"}
-        </Text>
-      </View>
-      <View style={{ ...styles.nameWrap, width: dim - 16 }}>
-        <TextInput
-          style={styles.inputFild}
-          textAlign="left"
-          placeholder="Название..."
-          value={namePlace}
-          onChangeText={(value) => {
-            setNamePlace(value);
-          }}
-        />
-      </View>
-      {/* text-align: center; */}
-      <View style={{ ...styles.geoPositWrap, width: dim - 16 }}>
-        <Feather name="map-pin" size={24} color="#BDBDBD" />
-        <TextInput
-          style={styles.inputFildGeo}
-          textAlign="left"
-          placeholder="Местность..."
-        />
-      </View>
-      <TouchableOpacity
+    // <View style={styles.screenContainer}>
+    <TouchableWithoutFeedback onPress={keyBoardHiden}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{
-          ...styles.btnUpLoad,
-          // marginTop: isShowKeyboard ? 0 : 27,
-          width: dim - 32,
+          ...styles.screenContainer,
+          // marginBottom: isShowKeyboard ? -80 : null,
         }}
-        activeOpacity={0.8}
-        onPress={toPublish}
       >
-        <Text style={styles.btnUpLoadText} width="100%">
-          Опубликовать
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <View
+          style={{ ...styles.containerP, marginTop: isShowKeyboard ? -50 : 32 }}
+        >
+          <Camera style={styles.camera} ref={(ref) => setCameraRef(ref)}>
+            {photo && (
+              <View style={styles.cameraContainer}>
+                <Image
+                  source={{ uri: photo }}
+                  style={{ height: "100%", width: "100%" }}
+                />
+              </View>
+            )}
+            <TouchableOpacity
+              // style={styles.btnLogin}
+              onPress={takePhoto}
+            >
+              <View style={styles.snapContainer}>
+                <FontAwesome name="camera" size={24} color="#BDBDBD" />
+              </View>
+            </TouchableOpacity>
+          </Camera>
+        </View>
+        {toggle ? (
+          <TouchableOpacity onPress={takePhoto} style={styles.editPhoto}>
+            <Text style={{ color: "#BDBDBD" }}>"Редактировать фото"</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={pickImage} style={styles.editPhoto}>
+            <Text style={{ color: "#BDBDBD" }}>"Загрузите фото"</Text>
+          </TouchableOpacity>
+        )}
+        <View style={{ ...styles.nameWrap, width: dimensionR - 16 }}>
+          <TextInput
+            style={styles.inputFild}
+            textAlign="left"
+            placeholder="Название..."
+            onFocus={() => {
+              setIsShowKeyboard(true);
+            }}
+            value={namePlace}
+            onChangeText={(value) => {
+              setNamePlace(value);
+            }}
+          />
+        </View>
+        {/* text-align: center; */}
+        <View style={{ ...styles.geoPositWrap, width: dimensionR - 16 }}>
+          <Feather name="map-pin" size={24} color="#BDBDBD" />
+          <TextInput
+            style={styles.inputFildGeo}
+            textAlign="left"
+            placeholder="Местность..."
+            onFocus={() => {
+              setIsShowKeyboard(true);
+            }}
+            value={locationPlace}
+            onChangeText={(value) => setLocationPlace(value)}
+          />
+        </View>
+        <TouchableOpacity
+          style={{
+            ...styles.btnUpLoad,
+            // marginTop: isShowKeyboard ? 0 : 27,
+            width: dimensionR - 32,
+          }}
+          activeOpacity={0.8}
+          onPress={toPublish}
+        >
+          <Text style={styles.btnUpLoadText} width="100%">
+            Опубликовать
+          </Text>
+        </TouchableOpacity>
+        <Pressable
+          onPress={resetState}
+          style={({ pressed }) => [
+            { backgroundColor: pressed ? "#FF6C00" : "#F6F6F6" },
+            styles.trashBask,
+          ]}
+        >
+          {({ pressed }) => (
+            <Feather
+              name="trash-2"
+              size={24}
+              color={pressed ? "white" : "#BDBDBD"}
+            />
+          )}
+        </Pressable>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+    // </View>
   );
 };
 
@@ -153,7 +245,6 @@ const styles = StyleSheet.create({
     height: 240,
     width: 343,
 
-    marginTop: 32,
     justifyContent: "center",
 
     borderRadius: 18,
@@ -250,6 +341,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderStyle: "solid",
     borderBottomColor: "#E8E8E8",
+  },
+  trashBask: {
+    width: 70,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "auto",
+    marginBottom: 102,
   },
 });
 

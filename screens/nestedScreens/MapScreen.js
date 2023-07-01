@@ -40,8 +40,3 @@ const styles = StyleSheet.create({
     height: "100%",
   },
 });
-
-{
-  /* <Text>{latitude}</Text>
-      <Text>{longitude}</Text> */
-}
