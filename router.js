@@ -9,20 +9,12 @@ const MainTab = createBottomTabNavigator();
 import { Feather, AntDesign } from "@expo/vector-icons";
 
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-
+import { useNavigation } from "@react-navigation/native";
 import { RegistrationScreen } from "./screens/auth/RegistrationScreen";
 import { LoginScreen } from "./screens/auth/LoginScreen";
 import { PostsScreen } from "./screens/mainScreens/PostsScreen";
 import { ProfileScreen } from "./screens/mainScreens/ProfileScreen";
 import { CreatePostsScreen } from "./screens/mainScreens/CreatePostsScreen";
-
-// const CustomButton = ({ onPress }) => {
-//   <TouchableOpacity style={styles.profile} onPress={onPress}>
-//     <View style={styles.button}>
-//       <AntDesign name="pluscircle" size="25" color="#FF6C00" />
-//     </View>
-//   </TouchableOpacity>;
-// };
 
 const screenOptions = {
   tabBarShowLabel: false,
@@ -36,6 +28,143 @@ const screenOptions = {
     backgroundColor: "#fff",
   },
   headerTitleAlign: "center",
+};
+
+const postScreenOptions = {
+  tabBarIcon: ({ focused }) => {
+    return (
+      <View
+        style={{
+          ...styles.profile,
+          backgroundColor: focused ? "#FF6C00" : "#FFFFFF",
+        }}
+      >
+        <AntDesign
+          name="appstore-o"
+          size={24}
+          color={focused ? "#FFFFFF" : "#212121"}
+        />
+      </View>
+    );
+  },
+  // box-shadow: 0px 0.5px 0px rgba(0, 0, 0, 0.3);
+  headerStyle: {
+    height: 88,
+    // backgroundColor: "#f4511e",
+    shadowColor: "#212121",
+    shadowOffset: { width: 0, height: 0.5 },
+    shadowOpacity: 0.3,
+    // shadowRadius: 2,
+  },
+  headerTitleStyle: {
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "Roboto-Regular",
+    fontWeight: "500",
+    fontSize: 17,
+    color: "#212121",
+    lineHeight: 22,
+  },
+  headerRight: () => (
+    // onPress={() => navigation.navigate({routeName: "Login"})}
+    <TouchableOpacity
+      onPress={() => alert("This is a LogOut!")}
+      style={{
+        marginRight: 16,
+      }}
+    >
+      {/* {focused ? (
+                <Feather name="log-out" size={24} color="#FF6C00" />
+              ) : (
+                <Feather name="log-in" size={24} color="#BDBDBD" />
+              )} */}
+      <Feather name="log-out" size={24} color="#BDBDBD" />
+    </TouchableOpacity>
+  ),
+};
+
+const createPostsOptions = {
+  tabBarIcon: ({ focused }) => {
+    return (
+      <View
+        style={{
+          ...styles.profile,
+          backgroundColor: focused ? "#FF6C00" : "#FFFFFF",
+        }}
+      >
+        <AntDesign
+          name="plus"
+          size={24}
+          color={focused ? "#FFFFFF" : "#212121"}
+        />
+      </View>
+    );
+  },
+  headerStyle: {
+    height: 88,
+    // backgroundColor: "#f4511e",
+    shadowColor: "#212121",
+    shadowOffset: { width: 0, height: 0.5 },
+    shadowOpacity: 0.3,
+    // shadowRadius: 2,
+  },
+  headerTitleStyle: {
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "Roboto-Regular",
+    fontWeight: "500",
+    fontSize: 17,
+    color: "#212121",
+    lineHeight: 22,
+  },
+  tabBarStyle: { display: "none" },
+  headerLeft: () => (
+    <TouchableOpacity
+      // onPress={() => navigation.navigate({ routeName: "PostsScreen" })}
+      onPress={() => alert("navigate to PostScreen!")}
+      style={{
+        marginLeft: 16,
+      }}
+    >
+      <Feather name="arrow-left" size={24} color="#212121CC" />
+    </TouchableOpacity>
+  ),
+};
+
+const profileScreenOptions = {
+  tabBarIcon: ({ focused }) => {
+    return (
+      <View
+        style={{
+          ...styles.profile,
+          backgroundColor: focused ? "#FF6C00" : "#FFFFFF",
+        }}
+      >
+        <AntDesign
+          name="user"
+          size={24}
+          color={focused ? "#FFFFFF" : "#212121"}
+        />
+      </View>
+    );
+  },
+  headerStyle: {
+    height: 88,
+    // backgroundColor: "#f4511e",
+    shadowColor: "#212121",
+    shadowOffset: { width: 0, height: 0.5 },
+    shadowOpacity: 0.3,
+    // shadowRadius: 2,
+  },
+  headerTitleStyle: {
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "Roboto-Regular",
+    fontWeight: "500",
+    fontSize: 17,
+    color: "#212121",
+    lineHeight: 22,
+  },
 };
 
 export const useRoute = (isAuth) => {
@@ -59,8 +188,7 @@ export const useRoute = (isAuth) => {
       </AuthStack.Navigator>
     );
   }
-  // <AntDesign name="pluscircle" size={24} color="black" />;
-  // <AntDesign name="pluscircleo" size={24} color="black" />;
+
   return (
     <MainTab.Navigator
       screenOptions={screenOptions}
@@ -68,142 +196,23 @@ export const useRoute = (isAuth) => {
     >
       <MainTab.Screen
         name="PostsScreen"
-        PostsScreen
+        // PostsScreen
         // В хедере на экране PostsScreen добавить иконку для logout
         // component={Home}
         component={PostsScreen}
-        options={{
-          tabBarIcon: ({ focused }) => {
-            return (
-              <View
-                style={{
-                  ...styles.profile,
-                  backgroundColor: focused ? "#FF6C00" : "#FFFFFF",
-                }}
-              >
-                <AntDesign
-                  name="appstore-o"
-                  size={24}
-                  color={focused ? "#FFFFFF" : "#212121"}
-                />
-              </View>
-            );
-          },
-          // box-shadow: 0px 0.5px 0px rgba(0, 0, 0, 0.3);
-          headerStyle: {
-            height: 88,
-            // backgroundColor: "#f4511e",
-            shadowColor: "#212121",
-            shadowOffset: { width: 0, height: 0.5 },
-            shadowOpacity: 0.3,
-            // shadowRadius: 2,
-          },
-          headerTitleStyle: {
-            justifyContent: "center",
-            alignItems: "center",
-            fontFamily: "Roboto-Regular",
-            fontWeight: "500",
-            fontSize: 17,
-            color: "#212121",
-            lineHeight: 22,
-          },
-          headerRight: () => (
-            // onPress={() => navigation.navigate({routeName: "Login"})}
-            <TouchableOpacity
-              onPress={() => alert("This is a LogOut!")}
-              style={{
-                marginRight: 16,
-              }}
-            >
-              {/* {focused ? (
-                <Feather name="log-out" size={24} color="#FF6C00" />
-              ) : (
-                <Feather name="log-in" size={24} color="#BDBDBD" />
-              )} */}
-              <Feather name="log-out" size={24} color="#BDBDBD" />
-            </TouchableOpacity>
-          ),
-        }}
+        options={postScreenOptions}
       />
 
       <MainTab.Screen
         name="CreatePosts"
         component={CreatePostsScreen}
-        options={{
-          tabBarIcon: ({ focused }) => {
-            return (
-              <View
-                style={{
-                  ...styles.profile,
-                  backgroundColor: focused ? "#FF6C00" : "#FFFFFF",
-                }}
-              >
-                <AntDesign
-                  name="plus"
-                  size={24}
-                  color={focused ? "#FFFFFF" : "#212121"}
-                />
-              </View>
-            );
-          },
-          headerStyle: {
-            height: 88,
-            // backgroundColor: "#f4511e",
-            shadowColor: "#212121",
-            shadowOffset: { width: 0, height: 0.5 },
-            shadowOpacity: 0.3,
-            // shadowRadius: 2,
-          },
-          headerTitleStyle: {
-            justifyContent: "center",
-            alignItems: "center",
-            fontFamily: "Roboto-Regular",
-            fontWeight: "500",
-            fontSize: 17,
-            color: "#212121",
-            lineHeight: 22,
-          },
-        }}
+        options={createPostsOptions}
       />
 
       <MainTab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ focused }) => {
-            return (
-              <View
-                style={{
-                  ...styles.profile,
-                  backgroundColor: focused ? "#FF6C00" : "#FFFFFF",
-                }}
-              >
-                <AntDesign
-                  name="user"
-                  size={24}
-                  color={focused ? "#FFFFFF" : "#212121"}
-                />
-              </View>
-            );
-          },
-          headerStyle: {
-            height: 88,
-            // backgroundColor: "#f4511e",
-            shadowColor: "#212121",
-            shadowOffset: { width: 0, height: 0.5 },
-            shadowOpacity: 0.3,
-            // shadowRadius: 2,
-          },
-          headerTitleStyle: {
-            justifyContent: "center",
-            alignItems: "center",
-            fontFamily: "Roboto-Regular",
-            fontWeight: "500",
-            fontSize: 17,
-            color: "#212121",
-            lineHeight: 22,
-          },
-        }}
+        options={profileScreenOptions}
       />
     </MainTab.Navigator>
   );

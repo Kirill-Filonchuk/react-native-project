@@ -103,15 +103,26 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const toPublish = () => {
     // namePlace = namePlace ? namePlace : "No name";
-    console.log("NamePlace ->>>", namePlace);
-
+    // console.log("NamePlace ->>>", namePlace);
+    // if (photo) {
+    //   navigation.navigate("DefaultScreen", {
+    //     photo: photo,
+    //     namePlace: namePlace,
+    //     location: location,
+    //     locationPlace: locationPlace,
+    //   });
+    //   resetState();
+    // }
     // console.log("toPublish->navigation", navigation);
     // in first point the Component and second - object with data that we transmit to another Component
-    navigation.navigate("DefaultScreen", {
-      photo: photo,
-      namePlace: namePlace,
-      location: location,
-      locationPlace: locationPlace,
+    navigation.navigate("PostsScreen", {
+      screen: "DefaultScreen",
+      params: {
+        photo: photo,
+        namePlace: namePlace,
+        location: location,
+        locationPlace: locationPlace,
+      },
     });
     // console.log("!!!----{ photo, namePlace }", { photo, namePlace, location });
     resetState();
@@ -349,7 +360,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: "auto",
-    marginBottom: 102,
+    marginBottom: 34,
   },
 });
 

@@ -16,6 +16,12 @@ export const PostsScreen = ({ navigation, route }) => {
       <NestedScreen.Screen
         name="DefaultScreen"
         component={DefaultScreenPosts}
+        initialParams={{
+          photo: null,
+          namePlace: "",
+          location: "",
+          locationPlace: "",
+        }}
       />
       <NestedScreen.Screen name="Map" component={MapScreen} />
       <NestedScreen.Screen name="Comments" component={CommentsScreen} />
