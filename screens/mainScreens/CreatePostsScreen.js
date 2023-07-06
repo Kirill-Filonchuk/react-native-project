@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+// import { getHeaderTitle } from "@react-navigation/elements";
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";

@@ -9,7 +9,8 @@ const MainTab = createBottomTabNavigator();
 import { Feather, AntDesign } from "@expo/vector-icons";
 
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+
+// import { useNavigation } from "@react-navigation/native";
 import { RegistrationScreen } from "./screens/auth/RegistrationScreen";
 import { LoginScreen } from "./screens/auth/LoginScreen";
 import { PostsScreen } from "./screens/mainScreens/PostsScreen";
@@ -47,6 +48,7 @@ const postScreenOptions = {
       </View>
     );
   },
+
   // box-shadow: 0px 0.5px 0px rgba(0, 0, 0, 0.3);
   headerStyle: {
     height: 88,
@@ -73,17 +75,12 @@ const postScreenOptions = {
         marginRight: 16,
       }}
     >
-      {/* {focused ? (
-                <Feather name="log-out" size={24} color="#FF6C00" />
-              ) : (
-                <Feather name="log-in" size={24} color="#BDBDBD" />
-              )} */}
       <Feather name="log-out" size={24} color="#BDBDBD" />
     </TouchableOpacity>
   ),
 };
 
-const createPostsOptions = {
+const createPostsOptions = ({ navigation }) => ({
   tabBarIcon: ({ focused }) => {
     return (
       <View
@@ -118,10 +115,11 @@ const createPostsOptions = {
     lineHeight: 22,
   },
   tabBarStyle: { display: "none" },
+
   headerLeft: () => (
     <TouchableOpacity
-      // onPress={() => navigation.navigate({ routeName: "PostsScreen" })}
-      onPress={() => alert("navigate to PostScreen!")}
+      onPress={() => navigation.navigate("PostsScreen")}
+      // onPress={() => alert("navigate to PostScreen!")}
       style={{
         marginLeft: 16,
       }}
@@ -129,7 +127,7 @@ const createPostsOptions = {
       <Feather name="arrow-left" size={24} color="#212121CC" />
     </TouchableOpacity>
   ),
-};
+});
 
 const profileScreenOptions = {
   tabBarIcon: ({ focused }) => {
@@ -167,7 +165,9 @@ const profileScreenOptions = {
   },
 };
 
-export const useRoute = (isAuth) => {
+export const useRoute = (isAuth, navigation) => {
+  // const navigation = useNavigation();
+
   if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Registration">
