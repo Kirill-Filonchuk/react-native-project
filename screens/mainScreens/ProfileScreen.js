@@ -6,7 +6,7 @@ import { counterSlice, initialState } from "../../redux/counter/counterSlice";
 import { REACT_APP_MY_KEY } from "@env";
 
 export const ProfileScreen = () => {
-  const counter = useSelector((state) => state.counter);
+  const counter = useSelector((state) => state.counter.counter);
   const dispatch = useDispatch();
   const [customeValue, setCuctomeValue] = useState(null);
   console.log(customeValue);

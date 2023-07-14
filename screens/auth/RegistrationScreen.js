@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import * as ImagePicker from "expo-image-picker";
+import { useDispatch } from "react-redux";
+import { authSignUpUser } from "../../redux/auth/authOperation";
 
 import {
   ImageBackground,
@@ -17,6 +19,7 @@ import {
   Keyboard,
 } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
+
 const bgImage = require("../../assets/images/photoBg.jpg");
 
 const initialStateReg = {
@@ -26,14 +29,15 @@ const initialStateReg = {
 };
 
 export const RegistrationScreen = ({ navigation }) => {
-  console.log(navigation);
   const [image, setImage] = useState(null);
   const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [showPassword, setShowPassword] = useState(true);
   const [stateRegister, setStateRegister] = useState(initialStateReg);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
 
-  console.log("dimensionR -Register>>", dimensionR);
+  const dispatch = useDispatch();
+
+  // console.log("dimensionR -Register>>", dimensionR);
   useEffect(() => {
     const onChange = () => {
       const width = Dimensions.get("window").width;
@@ -47,8 +51,17 @@ export const RegistrationScreen = ({ navigation }) => {
   const keyBoardHiden = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
-    console.log(stateRegister);
+    // console.log("stateRegister", stateRegister);
     // console.log(stateLogin);
+    // setStateRegister(initialStateReg);
+    // setStateLogin(initialStateLogin);
+  };
+
+  const handleSubmit = () => {
+    setIsShowKeyboard(false);
+    Keyboard.dismiss();
+    console.log("stateRegister", stateRegister);
+    dispatch(authSignUpUser(stateRegister));
     setStateRegister(initialStateReg);
     // setStateLogin(initialStateLogin);
   };
@@ -144,7 +157,7 @@ export const RegistrationScreen = ({ navigation }) => {
                 onChangeText={(value) =>
                   setStateRegister((prevState) => ({
                     ...prevState,
-                    email: value,
+                    email: value.toLowerCase(),
                   }))
                 }
               />
@@ -171,7 +184,10 @@ export const RegistrationScreen = ({ navigation }) => {
                   setShowPassword(!showPassword);
                 }}
               >
-                <Text style={styles.btnPassInputText} width="100%">
+                <Text
+                  style={{ ...styles.btnPassInputText, left: dimensionR - 270 }}
+                  width="100%"
+                >
                   {showPassword ? "Показать" : "Скрыть"}
                 </Text>
               </TouchableOpacity>
@@ -182,7 +198,7 @@ export const RegistrationScreen = ({ navigation }) => {
                   width: dimensionR - 32,
                 }}
                 activeOpacity={0.8}
-                onPress={keyBoardHiden}
+                onPress={handleSubmit}
               >
                 <Text style={styles.btnRegisterText} width="100%">
                   Зарегистрироваться
@@ -283,7 +299,6 @@ const styles = StyleSheet.create({
   btnPassInputText: {
     position: "relative",
     bottom: -335,
-    left: 150,
     color: "#1B4371",
     fontSize: 16,
     fontWeight: "400",

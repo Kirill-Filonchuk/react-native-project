@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { authSignInUser } from "../../redux/auth/authOperation";
 import { StatusBar } from "expo-status-bar";
 import {
   ImageBackground,
@@ -32,6 +34,8 @@ export const LoginScreen = ({ navigation }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   // console.log("dimensionL -Login>>", dimensionL);
 
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const onChenge = () => {
       const width = Dimensions.get("window").width;
@@ -41,12 +45,23 @@ export const LoginScreen = ({ navigation }) => {
     dimensionsHandler = Dimensions.addEventListener("change", onChenge);
     return () => dimensionsHandler.remove();
   }, []);
-  console.log(stateLogin);
+  // console.log(stateLogin);
+
   const keyBoardHiden = () => {
-    setIsShowKeyboard(false);
     Keyboard.dismiss();
+    setIsShowKeyboard(false);
     // console.log(stateRegister);
-    console.log(stateLogin);
+    // console.log(stateLogin);
+    // setStateRegister(initialStateReg);
+    // setStateLogin(initialStateLogin);
+  };
+
+  const handleSubmit = () => {
+    Keyboard.dismiss();
+    setIsShowKeyboard(false);
+    // console.log(stateRegister);
+    console.log("stateLogin", stateLogin);
+    dispatch(authSignInUser(stateLogin));
     // setStateRegister(initialStateReg);
     setStateLogin(initialStateLogin);
   };
@@ -80,7 +95,10 @@ export const LoginScreen = ({ navigation }) => {
                 }}
                 value={stateLogin.email}
                 onChangeText={(value) =>
-                  setStateLogin((prevState) => ({ ...prevState, email: value }))
+                  setStateLogin((prevState) => ({
+                    ...prevState,
+                    email: value.toLowerCase(),
+                  }))
                 }
               />
               <TextInput
@@ -110,7 +128,10 @@ export const LoginScreen = ({ navigation }) => {
                   setShowPassword(!showPassword);
                 }}
               >
-                <Text style={styles.btnPassInputText} width="100%">
+                <Text
+                  style={{ ...styles.btnPassInputText, left: dimensionL - 270 }}
+                  width="100%"
+                >
                   {showPassword ? "Показать" : "Скрыть"}
                 </Text>
               </TouchableOpacity>
@@ -121,7 +142,7 @@ export const LoginScreen = ({ navigation }) => {
                   width: dimensionL - 32,
                 }}
                 activeOpacity={0.8}
-                onPress={keyBoardHiden}
+                onPress={handleSubmit}
               >
                 <Text style={styles.btnRegisterText} width="100%">
                   Войти
@@ -191,7 +212,6 @@ const styles = StyleSheet.create({
   btnPassInputText: {
     position: "relative",
     bottom: -186,
-    left: 150,
     color: "#1B4371",
     fontSize: 16,
     fontWeight: "400",

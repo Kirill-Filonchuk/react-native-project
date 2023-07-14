@@ -165,9 +165,7 @@ const profileScreenOptions = {
   },
 };
 
-export const useRoute = (isAuth, navigation) => {
-  // const navigation = useNavigation();
-
+export const useRoute = (isAuth) => {
   if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Registration">
