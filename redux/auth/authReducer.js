@@ -13,6 +13,7 @@ export const authSlice = createSlice({
     updateUserProfile: (state, action) => ({
       ...state,
       userId: action.payload.userId,
+      nickName: action.payload.nickName,
     }),
     authStateChange: (state, { payload }) => ({
       ...state,

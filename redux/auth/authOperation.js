@@ -2,25 +2,35 @@ import auth from "../../firebase/config.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  currentUser,
+  updateProfile,
 } from "firebase/auth";
 
 import { authSlice } from "./authReducer.js";
 // console.log(db);
 // console.log("db", createUserWithEmailAndPassword());
 // const auth = getAuth();
+//login equil nickName
 export const authSignUpUser =
   ({ email, password, login }) =>
   async (dispatch, getState) => {
     console.log("{ email, password, login }", { email, password, login });
     try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
+      await createUserWithEmailAndPassword(auth, email, password);
+
+      await updateProfile(auth.currentUser, {
+        displayName: login,
+      });
+      // await auth.currentUser ?! BUT work without await in this !!!
+      const updateUser = auth.currentUser;
+      console.log("updateUSER authSignUpUser ->", updateUser);
+      const { displayName, uid } = updateUser;
+
+      dispatch(
+        authSlice.actions.updateUserProfile({
+          userId: uid,
+          nickName: displayName,
+        })
       );
-      dispatch(authSlice.actions.updateUserProfile({ userId: user.uid }));
-      console.log("USER authSignUpUser ->", user);
     } catch (error) {
       console.log("error message", error.message);
     }
