@@ -8,6 +8,8 @@ const MainTab = createBottomTabNavigator();
 
 import { Feather, AntDesign } from "@expo/vector-icons";
 
+import { useDispatch } from "react-redux";
+import { authSignOutUser } from "./redux/auth/authOperation";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 // import { useNavigation } from "@react-navigation/native";
@@ -31,7 +33,7 @@ const screenOptions = {
   headerTitleAlign: "center",
 };
 
-const postScreenOptions = {
+const postScreenOptions = (signOut) => ({
   tabBarIcon: ({ focused }) => {
     return (
       <View
@@ -70,7 +72,8 @@ const postScreenOptions = {
   headerRight: () => (
     // onPress={() => navigation.navigate({routeName: "Login"})}
     <TouchableOpacity
-      onPress={() => alert("This is a LogOut!")}
+      onPress={() => signOut()}
+      // onPress={() => alert("This is a signOut!")}
       style={{
         marginRight: 16,
       }}
@@ -78,7 +81,7 @@ const postScreenOptions = {
       <Feather name="log-out" size={24} color="#BDBDBD" />
     </TouchableOpacity>
   ),
-};
+});
 
 const createPostsOptions = ({ navigation }) => ({
   tabBarIcon: ({ focused }) => {
@@ -166,6 +169,10 @@ const profileScreenOptions = {
 };
 
 export const useRoute = (isAuth) => {
+  const dispatch = useDispatch();
+
+  const signOut = () => dispatch(authSignOutUser());
+
   if (!isAuth) {
     return (
       <AuthStack.Navigator initialRouteName="Registration">
@@ -195,10 +202,10 @@ export const useRoute = (isAuth) => {
       <MainTab.Screen
         name="PostsScreen"
         // PostsScreen
-        // В хедере на экране PostsScreen добавить иконку для logout
+        // В хедере на экране PostsScreen добавить иконку для logout - signOut
         // component={Home}
         component={PostsScreen}
-        options={postScreenOptions}
+        options={postScreenOptions(signOut)}
       />
 
       <MainTab.Screen
@@ -226,41 +233,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  // button: {
-  //   width: 70,
-  //   height: 40,
-  //   borderRadius: 35,
-  //   backgroundColor: "blue",
-  // },
 });
-
-// options={{
-//           tabBarButton: (props) => <CustomButton {...props} />,
-//         }}
-
-// const screenOptions = ({ route }) => ({
-//   tabBarIcon: ({ focused, color, size }) => {
-//     let iconName;
-
-//     if (route.name === "CreatePosts") {
-//       iconName = focused ? "user" : "user";
-//       size = 24;
-//     } else if (route.name === "Posts") {
-//       iconName = focused ? "appstore-o" : "appstore1";
-//       size = 24;
-//     } else if (route.name === "Profile") {
-//       iconName = focused ? "pluscircleo" : "pluscircle";
-//       size = 28;
-//       color = "black";
-//     }
-
-//     // You can return any component that you like here!
-//     return <AntDesign name={iconName} size={size} color={color} />;
-//   },
-//   tabBarShowLabel: false,
-//   tabBarStyle: {
-//     backgroundColor: "#fdf",
-//   },
-//   tabBarActiveTintColor: "tomato",
-//   tabBarInactiveTintColor: "gray",
-// });

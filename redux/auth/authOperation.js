@@ -52,6 +52,7 @@ export const authSignInUser =
 export const authSignOutUser = () => async (dispatch, getState) => {
   try {
     await signOut(auth);
+    dispatch(authSlice.actions.authSignOut());
   } catch (error) {
     console.log("error message", error.message);
     console.log("error code", error.code);
