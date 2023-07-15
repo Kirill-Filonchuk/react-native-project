@@ -1,25 +1,16 @@
-import auth from "./firebase/config";
-import { onAuthStateChanged } from "firebase/auth";
-import { StatusBar } from "expo-status-bar";
+// import { StatusBar } from "expo-status-bar";
 import { useState, useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { NavigationContainer } from "@react-navigation/native";
+// import { NavigationContainer } from "@react-navigation/native";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
-import { useRoute } from "./router";
+
+import { Main } from "./components/Main";
 
 SplashScreen.preventAutoHideAsync(); // Keep the splash screen visible while we fetch resources
 
 export default function App() {
-  const [user, setUser] = useState(null);
-  const routing = useRoute(user);
-
-  onAuthStateChanged(auth, (user) => {
-    setUser(user);
-    console.log("onAuthStateChange in App ->", user);
-  });
-
   const [fontsLoaded] = useFonts({
     "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
     "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
@@ -45,9 +36,10 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer onReady={onLayoutRootView}>
-        {routing}
-      </NavigationContainer>
+      {/* <NavigationContainer onReady={onLayoutRootView}>
+        <Main />
+      </NavigationContainer> */}
+      <Main onLayoutRootView={onLayoutRootView} />
     </Provider>
   );
 }

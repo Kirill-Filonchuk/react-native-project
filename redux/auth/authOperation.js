@@ -3,6 +3,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  onAuthStateChanged,
+  signOut,
 } from "firebase/auth";
 
 import { authSlice } from "./authReducer.js";
@@ -21,16 +23,15 @@ export const authSignUpUser =
         displayName: login,
       });
       // await auth.currentUser ?! BUT work without await in this !!!
-      const updateUser = auth.currentUser;
-      console.log("updateUSER authSignUpUser ->", updateUser);
-      const { displayName, uid } = updateUser;
+      const { displayName, uid } = auth.currentUser;
 
-      dispatch(
-        authSlice.actions.updateUserProfile({
-          userId: uid,
-          nickName: displayName,
-        })
-      );
+      const updateUserProfile = {
+        userId: uid,
+        nickName: displayName,
+      };
+      console.log("updateUSER authSignUpUser ->", updateUserProfile);
+
+      dispatch(authSlice.actions.updateUserProfile(updateUserProfile));
     } catch (error) {
       console.log("error message", error.message);
     }
@@ -48,9 +49,27 @@ export const authSignInUser =
     }
   };
 
-export const authSignOutUser = () => async (dispatch, getState) => {};
+export const authSignOutUser = () => async (dispatch, getState) => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.log("error message", error.message);
+    console.log("error code", error.code);
+  }
+};
 
 //роверяет не выходилили мы ранее из приложения
-export const authStateChangeUser = () => async (dispatch, getState) => {};
+export const authStateChangeUser = () => async (dispatch, getState) => {
+  await onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const updateUserProfile = {
+        userId: user.uid,
+        nickName: user.displayName,
+      };
+      dispatch(authSlice.actions.updateUserProfile(updateUserProfile));
+      dispatch(authSlice.actions.authStateChange({ stateChange: true }));
+    }
+  });
+};
 
 // export { authSignUpUser, authSignInUser, authSignOutUser };
