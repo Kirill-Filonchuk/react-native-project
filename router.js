@@ -180,14 +180,14 @@ export const useRoute = (isAuth) => {
           name="Registration"
           component={RegistrationScreen}
           options={{
-            headerShown: true,
+            headerShown: false,
             title: "Registration screen",
           }}
         />
         <AuthStack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: true, title: "Login screen" }}
+          options={{ headerShown: false, title: "Login screen" }}
         />
         {/* <MainStack.Screen name="Home" component={Home} /> */}
       </AuthStack.Navigator>

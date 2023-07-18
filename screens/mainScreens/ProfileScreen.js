@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { View, Text, Button, TextInput, StyleSheet } from "react-native";
 import { counterSlice, initialState } from "../../redux/counter/counterSlice";
+import { authSignOutUser } from "../../redux/auth/authOperation";
 import { REACT_APP_MY_KEY } from "@env";
 
 export const ProfileScreen = () => {
@@ -10,8 +11,16 @@ export const ProfileScreen = () => {
   const dispatch = useDispatch();
   const [customeValue, setCuctomeValue] = useState(null);
   console.log(customeValue);
+
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
+
   return (
     <View style={styles.containerP}>
+      <View>
+        <Button title="SignOut" onPress={signOut} />
+      </View>
       <Text>ProfileScreen button #3</Text>
       <Text>Counter section - {`${REACT_APP_MY_KEY}`}</Text>
       <Text>Quantity: {counter}</Text>

@@ -16,6 +16,7 @@ export const PostsScreen = ({ navigation, route }) => {
       <NestedScreen.Screen
         name="DefaultScreen"
         component={DefaultScreenPosts}
+        options={{ headerShown: false }}
         initialParams={{
           photo: null,
           namePlace: "",

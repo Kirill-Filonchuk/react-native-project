@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { ref } from "firebase/storage";
+import auth, { storage } from "../../firebase/config";
 // import { getHeaderTitle } from "@react-navigation/elements";
 import { Camera } from "expo-camera";
 import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
+// import { randomUUID } from "expo-crypto";
 
 import {
   View,
@@ -19,6 +22,7 @@ import {
   Keyboard,
 } from "react-native";
 import { FontAwesome, Feather } from "@expo/vector-icons";
+import { uploadBytes } from "firebase/storage";
 
 // const dim = Dimensions.get("window").width;
 
@@ -33,13 +37,16 @@ const initialStateForm = {
 export const CreatePostsScreen = ({ navigation }) => {
   const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+
   const [cameraRef, setCameraRef] = useState(initialStateForm.cameraRef); //in video ->setSnap
   const [location, setLocation] = useState(initialStateForm.location);
   const [locationPlace, setLocationPlace] = useState(
     initialStateForm.locationPlace
   );
   const [errorMsg, setErrorMsg] = useState(null);
+
   const [photo, setPhoto] = useState(initialStateForm.photo);
+
   const [namePlace, setNamePlace] = useState(initialStateForm.namePlace);
   const [toggle, setToggle] = useState(false);
 
@@ -67,6 +74,22 @@ export const CreatePostsScreen = ({ navigation }) => {
     dimensionsHandler = Dimensions.addEventListener("change", onChange);
     return () => dimensionsHandler.remove();
   }, []);
+
+  // const UUID = randomUUID();
+  console.log(
+    "Your UUID: ",
+    Math.floor((Date.now() + Math.random() * 100).toString())
+  );
+  // Upload foto to Server
+  const uploadPhotoToServer = async (photo) => {
+    const response = await fetch(photo);
+    const file = await response.blob();
+    const randomStr = Math.floor((Date.now() + Math.random() * 100).toString());
+    // await db.storage().ref(`postImg/${randomStr}`).put(file);
+    const refImg = await ref(storage, `postImg/${randomStr}`);
+    const data = await uploadBytes(refImg, file);
+    console.log("data", data);
+  };
 
   const keyBoardHiden = () => {
     setIsShowKeyboard(false);
@@ -96,26 +119,10 @@ export const CreatePostsScreen = ({ navigation }) => {
     console.log("cameraRef URI ->", photo.uri); //takePictureAsync() - take ref to our photo
     setPhoto(photo.uri);
     setToggle(!toggle);
-    // let location = await Location.getCurrentPositionAsync({});
-    // setLocation(location);
-    // console.log("location ->>>>", location);
-    // console.log("navigation", navigation);
   };
 
   const toPublish = () => {
-    // namePlace = namePlace ? namePlace : "No name";
-    // console.log("NamePlace ->>>", namePlace);
-    // if (photo) {
-    //   navigation.navigate("DefaultScreen", {
-    //     photo: photo,
-    //     namePlace: namePlace,
-    //     location: location,
-    //     locationPlace: locationPlace,
-    //   });
-    //   resetState();
-    // }
-    // console.log("toPublish->navigation", navigation);
-    // in first point the Component and second - object with data that we transmit to another Component
+    uploadPhotoToServer(photo);
     navigation.navigate("PostsScreen", {
       screen: "DefaultScreen",
       params: {
