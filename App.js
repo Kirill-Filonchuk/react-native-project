@@ -1,4 +1,5 @@
 // import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useState, useCallback, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -17,13 +18,6 @@ export default function App() {
     "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
   });
 
-  // useEffect(() => {
-  //   async function prepare() {
-  //     await SplashScreen.preventAutoHideAsync();
-  //   }
-  //   prepare();
-  // }, []);
-
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
@@ -33,13 +27,22 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
+  console.log("fontsLoaded", fontsLoaded);
 
   return (
-    <Provider store={store}>
-      {/* <NavigationContainer onReady={onLayoutRootView}>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        {/* <NavigationContainer onReady={onLayoutRootView}>
         <Main />
       </NavigationContainer> */}
-      <Main onLayoutRootView={onLayoutRootView} />
-    </Provider>
+        <Main onLayoutRootView={onLayoutRootView} />
+      </Provider>
+    </SafeAreaProvider>
   );
 }
+
+// Use useSafeAreaInsets hook from react-native-safe-area-context instead of SafeAreaView component
+// Don't wrap your whole app in SafeAreaView, instead apply the styles to content inside your screens
+// Apply only specific insets using the useSafeAreaInsets hook for more control
+
+// If you don't want to use the useFonts hook (for example, maybe you prefer class components), you can use Font.loadAsync directly. Under the hood, the hook uses Font.loadAsync from the expo-font library. You can use it directly if you prefer, or if you want to have more fine-grained control over when your fonts are loaded before rendering.

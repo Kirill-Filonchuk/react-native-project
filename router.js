@@ -172,6 +172,7 @@ export const useRoute = (isAuth) => {
   const dispatch = useDispatch();
 
   const signOut = () => dispatch(authSignOutUser());
+  console.log("isAuth route.js", isAuth);
 
   if (!isAuth) {
     return (

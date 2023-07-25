@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { ref } from "firebase/storage";
 import auth, { storage } from "../../firebase/config";
 // import { getHeaderTitle } from "@react-navigation/elements";
-import { Camera } from "expo-camera";
-import * as Location from "expo-location";
+import { Camera, CameraType } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 // import { randomUUID } from "expo-crypto";
 
 import {
@@ -31,40 +32,185 @@ const initialStateForm = {
   namePlace: "",
   locationPlace: null,
   location: null,
-  cameraRef: null,
+  fotoRef: null,
 };
 
 export const CreatePostsScreen = ({ navigation }) => {
+  const cameraUseRef = useRef(null);
   const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
-
-  const [cameraRef, setCameraRef] = useState(initialStateForm.cameraRef); //in video ->setSnap
+  ///////////
+  // const [cameraRef, setCameraRef] = useState(initialStateForm.cameraRef); //in video ->setSnap
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
+  // const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [errorCameraPermission, setErrorCameraPermission] = useState("");
+  ///////////
+  const [hasMediaLibraryPermission, setHasMediaLibraryPermission] =
+    useState(null);
+  const [errorMediaLibraryPermission, setErrorMediaLibraryPermission] =
+    useState("");
+  const [photo, setPhoto] = useState(initialStateForm.photo);
+  /////
+  const [hasLocationPermission, setHasLocationPermission] = useState(null);
+  const [errorLocationPermission, setErrorLocationPermission] = useState("");
   const [location, setLocation] = useState(initialStateForm.location);
   const [locationPlace, setLocationPlace] = useState(
     initialStateForm.locationPlace
   );
+  //Erroro message Location
   const [errorMsg, setErrorMsg] = useState(null);
-
-  const [photo, setPhoto] = useState(initialStateForm.photo);
 
   const [namePlace, setNamePlace] = useState(initialStateForm.namePlace);
   const [toggle, setToggle] = useState(false);
 
-  // console.log("dimensionR -CreatePostsScreen>>", dimensionR);
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        console.log("Permission to access location was denied");
-        setLocation(errorMsg);
-        return;
+      try {
+        const mediaLibraryPermission =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        setHasMediaLibraryPermission(
+          mediaLibraryPermission.status === "granted"
+        );
+      } catch (error) {
+        setErrorMediaLibraryPermission(error.message);
+        alert(errorMediaLibraryPermission);
       }
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-      // console.log("location ->>>>", location);
+      try {
+        const cameraStatusPermission =
+          await Camera.requestCameraPermissionsAsync();
+        setHasCameraPermission(cameraStatusPermission.status === "granted");
+      } catch (error) {
+        setErrorCameraPermission(error.message);
+        alert(errorCameraPermission);
+      }
+      try {
+        const locationPermission =
+          await Location.requestForegroundPermissionsAsync();
+        setHasLocationPermission(locationPermission.status === "granted");
+      } catch (error) {
+        setErrorLocationPermission(error.message);
+        alert(errorLocationPermission);
+      }
     })();
-  }, [photo]);
+  }, []);
+
+  const activateCamera = async () => {
+    if (cameraUseRef.current) {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      if (status === "granted") {
+        // Включаем камеру
+        cameraUseRef.current.resumePreview();
+      }
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Вызываем функцию активации камеры при возврате на экран с камерой
+      activateCamera();
+    });
+
+    return () => {
+      // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+      if (cameraUseRef.current) {
+        cameraUseRef.current.pausePreview();
+      }
+      // Удаляем listener
+      unsubscribe();
+    };
+  }, [navigation]);
+
+  // const activateCamera = async () => {
+  //   if (cameraUseRef.current) {
+  //     const { status } = await Camera.requestCameraPermissionsAsync();
+  //     if (status === "granted") {
+  //       cameraUseRef.current.resumePreview();
+  //     } else {
+  //       const { status: newStatus } =
+  //         await Camera.requestCameraPermissionsAsync();
+  //       if (newStatus === "granted") {
+  //         cameraUseRef.current.resumePreview();
+  //       } else {
+  //         setErrorCameraPermission(
+  //           "Ошибка: Нет разрешения на использование камеры."
+  //         );
+  //       }
+  //     }
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener("focus", () => {
+  //     // Вызываем функцию активации камеры при возврате на экран с камерой
+  //     activateCamera();
+  //   });
+
+  //   return () => {
+  //     // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+  //     if (cameraUseRef.current) {
+  //       cameraUseRef.current.pausePreview();
+  //     }
+  //     // Удаляем listener
+  //     unsubscribe();
+  //   };
+  // }, [navigation]);
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     activateCamera();
+  //     return () => {
+  //       if (cameraUseRef.current) {
+  //         cameraUseRef.current.pausePreview();
+  //       }
+  //     };
+  //   }, [])
+  // );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     activateCamera();
+  //     return () => {
+  //       // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+  //       if (cameraUseRef.current) {
+  //         cameraUseRef.current.pausePreview();
+  //       }
+  //     };
+  //   }, [])
+  // );
+  // useEffect(() => {
+  //   if (navigation.isFocused()) {
+  //     activateCamera(); // replace with your function
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener("focus", () => {
+  //     // Вызываем функцию активации камеры при возврате на экран с камерой
+  //     activateCamera();
+  //   });
+  //   // console.log("unsubscribe", unsubscribe);
+
+  //   return unsubscribe;
+  // }, [navigation]);
+
+  // const activateCamera = async () => {
+  //   console.log("CameraRef->", cameraUseRef.current);
+  //   console.log("hasCameraPermission->", hasCameraPermission);
+
+  //   if (cameraUseRef.current) {
+  //     const { status } =
+  //       await cameraUseRef.current.requestCameraPermissionsAsync();
+
+  //     if (status !== "granted") {
+  //       const { status } =
+  //         await cameraUseRef.current.requestCameraPermissionsAsync();
+  //       setHasCameraPermission(status === "granted");
+  //     }
+  //   }
+  //   console.log("hasCameraPermission->2", hasCameraPermission);
+  //   // const cameraStatusPermission = await Camera.requestCameraPermissionsAsync();
+  //   // setHasCameraPermission(cameraStatusPermission.status === "granted");
+  // };
 
   useEffect(() => {
     const onChange = () => {
@@ -75,12 +221,7 @@ export const CreatePostsScreen = ({ navigation }) => {
     return () => dimensionsHandler.remove();
   }, []);
 
-  // const UUID = randomUUID();
-  console.log(
-    "Your UUID: ",
-    Math.floor((Date.now() + Math.random() * 100).toString())
-  );
-  // Upload foto to Server
+  ///////// Upload foto to Server
   const uploadPhotoToServer = async (photo) => {
     const response = await fetch(photo);
     const file = await response.blob();
@@ -88,9 +229,9 @@ export const CreatePostsScreen = ({ navigation }) => {
     // await db.storage().ref(`postImg/${randomStr}`).put(file);
     const refImg = await ref(storage, `postImg/${randomStr}`);
     const data = await uploadBytes(refImg, file);
-    console.log("data", data);
+    console.log("uploadPhotoToServer-data", data);
   };
-
+  ///////////
   const keyBoardHiden = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
@@ -98,31 +239,52 @@ export const CreatePostsScreen = ({ navigation }) => {
   // console.log("location EseEff", location);
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    if (hasMediaLibraryPermission) {
+      const options = {
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      };
+      let result = await ImagePicker.launchImageLibraryAsync(options);
 
-    // console.log(result);
+      console.log(result);
 
-    if (!result.canceled) {
-      setPhoto(result.assets[0].uri);
-      setToggle(!toggle);
+      if (!result.canceled) {
+        setPhoto(result.assets[0].uri);
+        setToggle(!toggle);
+      }
     }
   };
 
   const takePhoto = async () => {
-    // await Permissions.askAsync(Permissions.LOCATION);
-    const photo = await cameraRef.takePictureAsync();
-    console.log("cameraRef URI ->", photo.uri); //takePictureAsync() - take ref to our photo
-    setPhoto(photo.uri);
-    setToggle(!toggle);
+    if (cameraUseRef.current && hasCameraPermission && hasLocationPermission) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      try {
+        const options = { quality: 0.7 };
+        const photo = await cameraUseRef.current.takePictureAsync(options);
+        console.log("CameraRef->", cameraUseRef.current);
+
+        console.log("cameraRef URI ->", photo.uri); //takePictureAsync() - take ref to our photo
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+        setPhoto(photo.uri);
+        setToggle(!toggle);
+      } catch (error) {
+        alert(error.message);
+        console.error(error.message);
+        setErrorMsg(error.message);
+      }
+    } else {
+      alert(
+        "Ошибка: Камера не запущена или нет разрешения на использование камеры и местоположения."
+      );
+    }
   };
 
-  const toPublish = () => {
-    uploadPhotoToServer(photo);
+  const toPublish = async () => {
+    await uploadPhotoToServer(photo);
     navigation.navigate("PostsScreen", {
       screen: "DefaultScreen",
       params: {
@@ -132,22 +294,17 @@ export const CreatePostsScreen = ({ navigation }) => {
         locationPlace: locationPlace,
       },
     });
-    // console.log("!!!----{ photo, namePlace }", { photo, namePlace, location });
     resetState();
-    // setNamePlace("");
-    // setLocationPlace("");
   };
 
   function resetState() {
-    const { photo, namePlace, locationPlace, location, cameraRef } =
-      initialStateForm;
+    const { photo, namePlace, locationPlace, location } = initialStateForm;
     setPhoto(photo);
     setNamePlace(namePlace);
     setLocationPlace(locationPlace);
     setLocation(location);
-    setCameraRef(cameraRef);
   }
-
+  // console.log("Camera==>>", Camera);
   return (
     // <View style={styles.screenContainer}>
     <TouchableWithoutFeedback onPress={keyBoardHiden}>
@@ -161,7 +318,14 @@ export const CreatePostsScreen = ({ navigation }) => {
         <View
           style={{ ...styles.containerP, marginTop: isShowKeyboard ? -50 : 32 }}
         >
-          <Camera style={styles.camera} ref={(ref) => setCameraRef(ref)}>
+          {/* <Camera style={styles.camera} ref={(ref) => setCameraRef(ref)}> cameraRef */}
+          <Camera
+            style={styles.camera}
+            ref={cameraUseRef}
+            type={type}
+            flashMode={flash}
+            // useCamera2Api={false}
+          >
             {photo && (
               <View style={styles.cameraContainer}>
                 <Image
@@ -189,6 +353,8 @@ export const CreatePostsScreen = ({ navigation }) => {
             <Text style={{ color: "#BDBDBD" }}>"Загрузите фото"</Text>
           </TouchableOpacity>
         )}
+        {!hasCameraPermission && <Text>No camere Permission</Text>}
+        {!cameraUseRef && <Text>No cameraUseRef - {errorMsg}</Text>}
         <View style={{ ...styles.nameWrap, width: dimensionR - 16 }}>
           <TextInput
             style={styles.inputFild}
