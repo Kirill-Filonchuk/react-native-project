@@ -4,11 +4,7 @@ import { ref } from "firebase/storage";
 import auth, { storage } from "../../firebase/config";
 import { displayCameraActivityFailedAlert } from "../../patch/cameraPatch";
 // import { getHeaderTitle } from "@react-navigation/elements";
-import {
-  Camera,
-  getCameraPermissionsAsync,
-  requestCameraPermissionsAsync,
-} from "expo-camera";
+import { Camera, getCameraPermissionsAsync } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 // import { randomUUID } from "expo-crypto";
@@ -26,6 +22,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Button,
 } from "react-native";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import { uploadBytes } from "firebase/storage";
@@ -130,41 +127,7 @@ export const CreatePostsScreen = ({ navigation }) => {
     const data = await uploadBytes(refImg, file);
     console.log("uploadPhotoToServer-data", data);
   };
-  ///////////ChatGpt advice - don't working but does not interfere
-
-  // const activateCamera = async () => {
-  //   if (cameraRef && hasCameraPermission) {
-  //     // Проверяем, если камера готова
-  //     if (cameraRef.isAvailable()) {
-  //       const { status } = await Camera.requestCameraPermissionsAsync();
-  //       if (status === "granted") {
-  //         // Убедимся, что камера была остановлена перед повторным запуском
-  //         if (cameraRef.isPreviewing) {
-  //           cameraRef.stopPreview();
-  //         }
-  //         cameraRef.resumePreview();
-  //       }
-  //     } else {
-  //       alert("Ошибка: Камера не готова.");
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener("focus", () => {
-  //     // Вызываем функцию активации камеры при возврате на экран с камерой
-  //     activateCamera();
-  //   });
-
-  //   return () => {
-  //     // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
-  //     if (cameraRef) {
-  //       cameraRef.pausePreview();
-  //     }
-  //     // Удаляем listener
-  //     unsubscribe();
-  //   };
-  // }, [navigation]);
+  ///////////
 
   ////
   const keyBoardHiden = () => {
@@ -194,12 +157,8 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const takePhoto = async () => {
     const isCameraPerm = await getCameraPermissionsAsync();
-    // await getCurrentPositionAsync();
-    console.log("isCameraPerm -!!!!--->", isCameraPerm);
+    console.log("isCameraPerm -!!!!--->cameraRef.isAvailable()", isCameraPerm);
     if (cameraRef && hasCameraPermission && hasLocationPermission) {
-      // if (!isCameraReady) {
-      //   await activateCamera(); // Вызываем функцию активации камеры, если она еще не готова
-      // }
       try {
         const options = { quality: 0.7 };
         const photo = await cameraRef.takePictureAsync(options);
@@ -237,7 +196,7 @@ export const CreatePostsScreen = ({ navigation }) => {
       });
       resetState();
     } catch (error) {
-      console.error(error.message);
+      console.error("!!!->Error uploadPhotoToServer", error.message);
     }
   };
 
@@ -300,6 +259,16 @@ export const CreatePostsScreen = ({ navigation }) => {
         )}
         {!hasCameraPermission && <Text>No camere Permission</Text>}
         {!cameraRef && <Text>No cameraUseRef - {errorMsg}</Text>}
+        <Button
+          title={`Camera - ${type === 0 ? "back" : "front"}`}
+          onPress={() => {
+            setType(
+              type === Camera.Constants.Type.back
+                ? Camera.Constants.Type.front
+                : Camera.Constants.Type.back
+            );
+          }}
+        ></Button>
         <View style={{ ...styles.nameWrap, width: dimensionR - 16 }}>
           <TextInput
             style={styles.inputFild}
@@ -482,6 +451,40 @@ const styles = StyleSheet.create({
     marginBottom: 34,
   },
 });
+
+// const activateCamera = async () => {
+//   if (cameraRef && hasCameraPermission) {
+//     // Проверяем, если камера готова
+//     if (cameraRef.isAvailable()) {
+//       const { status } = await Camera.requestCameraPermissionsAsync();
+//       if (status === "granted") {
+//         // Убедимся, что камера была остановлена перед повторным запуском
+//         if (cameraRef.isPreviewing) {
+//           cameraRef.stopPreview();
+//         }
+//         cameraRef.resumePreview();
+//       }
+//     } else {
+//       alert("Ошибка: Камера не готова.");
+//     }
+//   }
+// };
+
+// useEffect(() => {
+//   const unsubscribe = navigation.addListener("focus", () => {
+//     // Вызываем функцию активации камеры при возврате на экран с камерой
+//     activateCamera();
+//   });
+
+//   return () => {
+//     // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+//     if (cameraRef) {
+//       cameraRef.pausePreview();
+//     }
+//     // Удаляем listener
+//     unsubscribe();
+//   };
+// }, [navigation]);
 
 //restart App
 // try {
