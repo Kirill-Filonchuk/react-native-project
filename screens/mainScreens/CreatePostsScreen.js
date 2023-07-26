@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { ref } from "firebase/storage";
 import auth, { storage } from "../../firebase/config";
+import { displayCameraActivityFailedAlert } from "../../patch/cameraPatch";
 // import { getHeaderTitle } from "@react-navigation/elements";
-import { Camera, CameraType } from "expo-camera";
+import {
+  Camera,
+  getCameraPermissionsAsync,
+  requestCameraPermissionsAsync,
+} from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 // import { randomUUID } from "expo-crypto";
@@ -33,14 +38,21 @@ const initialStateForm = {
   locationPlace: null,
   location: null,
   fotoRef: null,
+  cameraRef: null,
 };
 
 export const CreatePostsScreen = ({ navigation }) => {
-  const cameraUseRef = useRef(null);
   const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   ///////////
-  // const [cameraRef, setCameraRef] = useState(initialStateForm.cameraRef); //in video ->setSnap
+  const [cameraRef, setCameraRef] = useState(initialStateForm.cameraRef); //in video ->setSnap
+
+  // const [isCameraReady, setIsCameraReady] = useState(false);
+
+  // const onCameraReady = () => {
+  //   setIsCameraReady(true);
+  // };
+
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   // const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -95,122 +107,9 @@ export const CreatePostsScreen = ({ navigation }) => {
       }
     })();
   }, []);
-
-  const activateCamera = async () => {
-    if (cameraUseRef.current) {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      if (status === "granted") {
-        // Включаем камеру
-        cameraUseRef.current.resumePreview();
-      }
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // Вызываем функцию активации камеры при возврате на экран с камерой
-      activateCamera();
-    });
-
-    return () => {
-      // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
-      if (cameraUseRef.current) {
-        cameraUseRef.current.pausePreview();
-      }
-      // Удаляем listener
-      unsubscribe();
-    };
-  }, [navigation]);
-
-  // const activateCamera = async () => {
-  //   if (cameraUseRef.current) {
-  //     const { status } = await Camera.requestCameraPermissionsAsync();
-  //     if (status === "granted") {
-  //       cameraUseRef.current.resumePreview();
-  //     } else {
-  //       const { status: newStatus } =
-  //         await Camera.requestCameraPermissionsAsync();
-  //       if (newStatus === "granted") {
-  //         cameraUseRef.current.resumePreview();
-  //       } else {
-  //         setErrorCameraPermission(
-  //           "Ошибка: Нет разрешения на использование камеры."
-  //         );
-  //       }
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener("focus", () => {
-  //     // Вызываем функцию активации камеры при возврате на экран с камерой
-  //     activateCamera();
-  //   });
-
-  //   return () => {
-  //     // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
-  //     if (cameraUseRef.current) {
-  //       cameraUseRef.current.pausePreview();
-  //     }
-  //     // Удаляем listener
-  //     unsubscribe();
-  //   };
-  // }, [navigation]);
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     activateCamera();
-  //     return () => {
-  //       if (cameraUseRef.current) {
-  //         cameraUseRef.current.pausePreview();
-  //       }
-  //     };
-  //   }, [])
-  // );
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     activateCamera();
-  //     return () => {
-  //       // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
-  //       if (cameraUseRef.current) {
-  //         cameraUseRef.current.pausePreview();
-  //       }
-  //     };
-  //   }, [])
-  // );
-  // useEffect(() => {
-  //   if (navigation.isFocused()) {
-  //     activateCamera(); // replace with your function
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener("focus", () => {
-  //     // Вызываем функцию активации камеры при возврате на экран с камерой
-  //     activateCamera();
-  //   });
-  //   // console.log("unsubscribe", unsubscribe);
-
-  //   return unsubscribe;
-  // }, [navigation]);
-
-  // const activateCamera = async () => {
-  //   console.log("CameraRef->", cameraUseRef.current);
-  //   console.log("hasCameraPermission->", hasCameraPermission);
-
-  //   if (cameraUseRef.current) {
-  //     const { status } =
-  //       await cameraUseRef.current.requestCameraPermissionsAsync();
-
-  //     if (status !== "granted") {
-  //       const { status } =
-  //         await cameraUseRef.current.requestCameraPermissionsAsync();
-  //       setHasCameraPermission(status === "granted");
-  //     }
-  //   }
-  //   console.log("hasCameraPermission->2", hasCameraPermission);
-  //   // const cameraStatusPermission = await Camera.requestCameraPermissionsAsync();
-  //   // setHasCameraPermission(cameraStatusPermission.status === "granted");
-  // };
+  console.log("hasCameraPermission", hasCameraPermission);
+  console.log("hasMediaLibraryPermission", hasMediaLibraryPermission);
+  console.log("hasLocationPermission", hasLocationPermission);
 
   useEffect(() => {
     const onChange = () => {
@@ -231,7 +130,43 @@ export const CreatePostsScreen = ({ navigation }) => {
     const data = await uploadBytes(refImg, file);
     console.log("uploadPhotoToServer-data", data);
   };
-  ///////////
+  ///////////ChatGpt advice - don't working but does not interfere
+
+  // const activateCamera = async () => {
+  //   if (cameraRef && hasCameraPermission) {
+  //     // Проверяем, если камера готова
+  //     if (cameraRef.isAvailable()) {
+  //       const { status } = await Camera.requestCameraPermissionsAsync();
+  //       if (status === "granted") {
+  //         // Убедимся, что камера была остановлена перед повторным запуском
+  //         if (cameraRef.isPreviewing) {
+  //           cameraRef.stopPreview();
+  //         }
+  //         cameraRef.resumePreview();
+  //       }
+  //     } else {
+  //       alert("Ошибка: Камера не готова.");
+  //     }
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener("focus", () => {
+  //     // Вызываем функцию активации камеры при возврате на экран с камерой
+  //     activateCamera();
+  //   });
+
+  //   return () => {
+  //     // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+  //     if (cameraRef) {
+  //       cameraRef.pausePreview();
+  //     }
+  //     // Удаляем listener
+  //     unsubscribe();
+  //   };
+  // }, [navigation]);
+
+  ////
   const keyBoardHiden = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
@@ -258,13 +193,17 @@ export const CreatePostsScreen = ({ navigation }) => {
   };
 
   const takePhoto = async () => {
-    if (cameraUseRef.current && hasCameraPermission && hasLocationPermission) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
+    const isCameraPerm = await getCameraPermissionsAsync();
+    // await getCurrentPositionAsync();
+    console.log("isCameraPerm -!!!!--->", isCameraPerm);
+    if (cameraRef && hasCameraPermission && hasLocationPermission) {
+      // if (!isCameraReady) {
+      //   await activateCamera(); // Вызываем функцию активации камеры, если она еще не готова
+      // }
       try {
         const options = { quality: 0.7 };
-        const photo = await cameraUseRef.current.takePictureAsync(options);
-        console.log("CameraRef->", cameraUseRef.current);
+        const photo = await cameraRef.takePictureAsync(options);
+        console.log("CameraRef->", cameraRef);
 
         console.log("cameraRef URI ->", photo.uri); //takePictureAsync() - take ref to our photo
         let location = await Location.getCurrentPositionAsync({});
@@ -272,7 +211,7 @@ export const CreatePostsScreen = ({ navigation }) => {
         setPhoto(photo.uri);
         setToggle(!toggle);
       } catch (error) {
-        alert(error.message);
+        // alert(error.message);
         console.error(error.message);
         setErrorMsg(error.message);
       }
@@ -284,17 +223,22 @@ export const CreatePostsScreen = ({ navigation }) => {
   };
 
   const toPublish = async () => {
-    await uploadPhotoToServer(photo);
-    navigation.navigate("PostsScreen", {
-      screen: "DefaultScreen",
-      params: {
-        photo: photo,
-        namePlace: namePlace,
-        location: location,
-        locationPlace: locationPlace,
-      },
-    });
-    resetState();
+    try {
+      console.log("cameraRef URI ->", photo);
+      await uploadPhotoToServer(photo);
+      navigation.navigate("PostsScreen", {
+        screen: "DefaultScreen",
+        params: {
+          photo: photo,
+          namePlace: namePlace,
+          location: location,
+          locationPlace: locationPlace,
+        },
+      });
+      resetState();
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   function resetState() {
@@ -321,9 +265,10 @@ export const CreatePostsScreen = ({ navigation }) => {
           {/* <Camera style={styles.camera} ref={(ref) => setCameraRef(ref)}> cameraRef */}
           <Camera
             style={styles.camera}
-            ref={cameraUseRef}
+            ref={setCameraRef}
             type={type}
             flashMode={flash}
+            // onCameraReady={onCameraReady}
             // useCamera2Api={false}
           >
             {photo && (
@@ -354,7 +299,7 @@ export const CreatePostsScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
         {!hasCameraPermission && <Text>No camere Permission</Text>}
-        {!cameraUseRef && <Text>No cameraUseRef - {errorMsg}</Text>}
+        {!cameraRef && <Text>No cameraUseRef - {errorMsg}</Text>}
         <View style={{ ...styles.nameWrap, width: dimensionR - 16 }}>
           <TextInput
             style={styles.inputFild}
@@ -538,6 +483,21 @@ const styles = StyleSheet.create({
   },
 });
 
+//restart App
+// try {
+//   result = await ImagePicker.launchCameraAsync();
+// } catch (e) {
+//   if (
+//     e.message.includes(
+//       "Call to function 'ExponentImagePicker.launchCameraAsync' has been rejected"
+//     )
+//   ) {
+//     displayCameraActivityFailedAlert();
+//   } else {
+//     throw e;
+//   }
+// }
+
 // camera: {
 //   flex: 2,
 //   overflow: "hidden",
@@ -564,22 +524,118 @@ const styles = StyleSheet.create({
 //   // borderWidth: 1,
 // },
 
-// const { status } = await Location.requestBackgroundPermissionsAsync();
-// if (status === "granted") {
-//   const startLoc = await Location.startLocationUpdatesAsync(
-//     LOCATION_TASK_NAME,
-//     {
-//       accuracy: Location.Accuracy.BestForNavigation,
-//       timeInterval: 3000,
-//       foregroundService: {
-//         notificationTitle: "BackgroundLocation Is On",
-//         notificationBody: "We are tracking your location",
-//         notificationColor: "#ffce52",
-//       },
+// const activateCamera = async () => {
+//   if (cameraUseRef.current) {
+//     const { status } = await Camera.requestCameraPermissionsAsync();
+//     if (status === "granted") {
+//       // Включаем камеру
+//       cameraUseRef.current.resumePreview();
 //     }
-//   );
-//   console.log("status", startLoc);
-// }
-// Location.getForegroundPermission;
-// const location = await Location.getLastKnownPositionAsync();
-// console.log("location", location);
+//   }
+// };
+
+// useEffect(() => {
+//   const unsubscribe = navigation.addListener("focus", () => {
+//     // Вызываем функцию активации камеры при возврате на экран с камерой
+//     activateCamera();
+//   });
+
+//   return () => {
+//     // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+//     if (cameraUseRef.current) {
+//       cameraUseRef.current.pausePreview();
+//     }
+//     // Удаляем listener
+//     unsubscribe();
+//   };
+// }, [navigation]);
+
+// const activateCamera = async () => {
+//   if (cameraUseRef.current) {
+//     const { status } = await Camera.requestCameraPermissionsAsync();
+//     if (status === "granted") {
+//       cameraUseRef.current.resumePreview();
+//     } else {
+//       const { status: newStatus } =
+//         await Camera.requestCameraPermissionsAsync();
+//       if (newStatus === "granted") {
+//         cameraUseRef.current.resumePreview();
+//       } else {
+//         setErrorCameraPermission(
+//           "Ошибка: Нет разрешения на использование камеры."
+//         );
+//       }
+//     }
+//   }
+// };
+
+// useEffect(() => {
+//   const unsubscribe = navigation.addListener("focus", () => {
+//     // Вызываем функцию активации камеры при возврате на экран с камерой
+//     activateCamera();
+//   });
+
+//   return () => {
+//     // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+//     if (cameraUseRef.current) {
+//       cameraUseRef.current.pausePreview();
+//     }
+//     // Удаляем listener
+//     unsubscribe();
+//   };
+// }, [navigation]);
+// useFocusEffect(
+//   React.useCallback(() => {
+//     activateCamera();
+//     return () => {
+//       if (cameraUseRef.current) {
+//         cameraUseRef.current.pausePreview();
+//       }
+//     };
+//   }, [])
+// );
+// useFocusEffect(
+//   React.useCallback(() => {
+//     activateCamera();
+//     return () => {
+//       // При выходе с экрана останавливаем камеру, чтобы освободить ресурсы
+//       if (cameraUseRef.current) {
+//         cameraUseRef.current.pausePreview();
+//       }
+//     };
+//   }, [])
+// );
+// useEffect(() => {
+//   if (navigation.isFocused()) {
+//     activateCamera(); // replace with your function
+//   }
+// }, []);
+
+// useEffect(() => {
+//   const unsubscribe = navigation.addListener("focus", () => {
+//     // Вызываем функцию активации камеры при возврате на экран с камерой
+//     activateCamera();
+//   });
+//   // console.log("unsubscribe", unsubscribe);
+
+//   return unsubscribe;
+// }, [navigation]);
+
+// const activateCamera = async () => {
+//   console.log("CameraRef->", cameraUseRef.current);
+//   console.log("hasCameraPermission->", hasCameraPermission);
+
+//   if (cameraUseRef.current) {
+//     const { status } =
+//       await cameraUseRef.current.requestCameraPermissionsAsync();
+
+//     if (status !== "granted") {
+//       const { status } =
+//         await cameraUseRef.current.requestCameraPermissionsAsync();
+//       setHasCameraPermission(status === "granted");
+//     }
+//   }
+//   console.log("hasCameraPermission->2", hasCameraPermission);
+//   // const cameraStatusPermission = await Camera.requestCameraPermissionsAsync();
+//   // setHasCameraPermission(cameraStatusPermission.status === "granted");
+// };
