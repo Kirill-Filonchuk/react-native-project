@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { ref } from "firebase/storage";
 import auth, { storage } from "../../firebase/config";
-import { displayCameraActivityFailedAlert } from "../../patch/cameraPatch";
+
 // import { getHeaderTitle } from "@react-navigation/elements";
 import { Camera, getCameraPermissionsAsync } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
@@ -24,7 +24,7 @@ import {
   Keyboard,
   Button,
 } from "react-native";
-import { FontAwesome, Feather } from "@expo/vector-icons";
+import { FontAwesome, Feather, Ionicons } from "@expo/vector-icons";
 import { uploadBytes } from "firebase/storage";
 
 // const dim = Dimensions.get("window").width;
@@ -238,7 +238,28 @@ export const CreatePostsScreen = ({ navigation }) => {
                 />
               </View>
             )}
+
             <TouchableOpacity
+              style={styles.cameraRevers}
+              onPress={() => {
+                setType(
+                  type === Camera.Constants.Type.back
+                    ? Camera.Constants.Type.front
+                    : Camera.Constants.Type.back
+                );
+              }}
+            >
+              <View style={styles.snapContainerCameraRevers}>
+                <Ionicons name="md-camera-reverse" size={24} color="#BDBDBD" />
+                <Text
+                  style={{
+                    color: "#F6F6F6",
+                  }}
+                >{`${type === 0 ? "back" : "front"}`}</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cameraTakePhoto}
               // style={styles.btnLogin}
               onPress={takePhoto}
             >
@@ -259,16 +280,7 @@ export const CreatePostsScreen = ({ navigation }) => {
         )}
         {!hasCameraPermission && <Text>No camere Permission</Text>}
         {!cameraRef && <Text>No cameraUseRef - {errorMsg}</Text>}
-        <Button
-          title={`Camera - ${type === 0 ? "back" : "front"}`}
-          onPress={() => {
-            setType(
-              type === Camera.Constants.Type.back
-                ? Camera.Constants.Type.front
-                : Camera.Constants.Type.back
-            );
-          }}
-        ></Button>
+
         <View style={{ ...styles.nameWrap, width: dimensionR - 16 }}>
           <TextInput
             style={styles.inputFild}
@@ -356,8 +368,7 @@ const styles = StyleSheet.create({
   camera: {
     height: 240,
     width: 343,
-
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   snapContainer: {
@@ -369,12 +380,24 @@ const styles = StyleSheet.create({
     // backgroundColor: "transparent",
     backgroundColor: "#fff",
   },
+  snapContainerCameraRevers: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 60,
+    height: 60,
+    backgroundColor: "transparent",
+  },
+  cameraRevers: {
+    alignSelf: "flex-end",
+  },
+  cameraTakePhoto: {
+    justifyContent: "flex-end",
+    marginBottom: 10,
+  },
   cameraContainer: {
     position: "absolute",
     height: 240,
     width: 343,
-    // top: 200,
-    // left: 10,
     borderColor: "#fda",
     borderWidth: 1,
     borderRadius: 18,
