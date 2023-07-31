@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { ref, getDownloadURL, uploadBytes, listAll } from "firebase/storage";
-import auth, { storage } from "../../firebase/config";
+import { collection, addDoc } from "firebase/firestore";
+import auth, { storage, db } from "../../firebase/config";
 
 // import { getHeaderTitle } from "@react-navigation/elements";
 import { Camera, getCameraPermissionsAsync } from "expo-camera";
@@ -39,6 +41,7 @@ const initialStateForm = {
 };
 
 export const CreatePostsScreen = ({ navigation }) => {
+  const { userId, nickName } = useSelector((state) => state.auth);
   const [dimensionR, setDimensionR] = useState(Dimensions.get("window").width);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   ///////////
@@ -104,16 +107,8 @@ export const CreatePostsScreen = ({ navigation }) => {
       }
     })();
   }, []);
-  // console.log("hasCameraPermission", hasCameraPermission);
-  // console.log("hasMediaLibraryPermission", hasMediaLibraryPermission);
-  // console.log("hasLocationPermission", hasLocationPermission);
 
-  // const imageListRef = ref(storage, "postImg/");
-  // console.log("imageListRef !-!-->", imageListRef);
   useEffect(() => {
-    // listAll(imageListRef)
-    //   .then((r) => getDownloadURL(r.items[0]))
-    //   .then((r) => console.log("listAll(imageListRef)->", r));
     const onChange = () => {
       const width = Dimensions.get("window").width;
       setDimensionR(width);
@@ -123,7 +118,7 @@ export const CreatePostsScreen = ({ navigation }) => {
   }, []);
 
   ///////// Upload foto to Server
-  const uploadPhotoToServer = async (photo) => {
+  async function uploadPhotoToServer() {
     // const imageListRef = ref(storage, "postImg/");
     const response = await fetch(photo);
     const file = await response.blob();
@@ -134,8 +129,8 @@ export const CreatePostsScreen = ({ navigation }) => {
     const data = await uploadBytes(refImg, file);
     console.log("uploadPhotoToServer - uploadBytes-data", data);
     const processedPhoto = await getDownloadURL(
-      // ref(storage, `postImg/${randomStr}`)
-      ref(storage, "postImg/").child(`${randomStr}`)
+      ref(storage, `postImg/${randomStr}`)
+      // ref(storage, "postImg").child(`${randomStr}`) - depricated method child ()
     );
     console.log("processedPhoto !-!-->", processedPhoto);
 
@@ -144,10 +139,28 @@ export const CreatePostsScreen = ({ navigation }) => {
       name: refImg.name,
       // perent: refImg.parent,
     });
-
-    // listen for events
-  };
+    return processedPhoto;
+  }
   ///////////
+
+  ///// Upload Post to Server
+  async function uploadPostToServer() {
+    try {
+      const photoLincUrl = await uploadPhotoToServer();
+      const createPost = await addDoc(collection(db, "posts"), {
+        userId,
+        nickName,
+        photo: photoLincUrl,
+        namePlace: namePlace,
+        location: location.coords,
+        locationPlace: locationPlace,
+      });
+      console.log("createPost to FS DB ->", createPost);
+      console.log("Document written with ID: ", createPost.id);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
+  }
 
   ////
   const keyBoardHiden = () => {
@@ -202,10 +215,12 @@ export const CreatePostsScreen = ({ navigation }) => {
     }
   };
 
-  const toPublish = async () => {
+  // Pablish Data to PostsScreen
+  const toPublish = () => {
     try {
       // console.log("cameraRef URI ->", photo);
-      await uploadPhotoToServer(photo);
+      //Upload Post to Server
+      uploadPostToServer();
       navigation.navigate("PostsScreen", {
         screen: "DefaultScreen",
         params: {
