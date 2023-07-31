@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { ref } from "firebase/storage";
+import { ref, getDownloadURL, uploadBytes, listAll } from "firebase/storage";
 import auth, { storage } from "../../firebase/config";
 
 // import { getHeaderTitle } from "@react-navigation/elements";
@@ -25,10 +25,10 @@ import {
   Button,
 } from "react-native";
 import { FontAwesome, Feather, Ionicons } from "@expo/vector-icons";
-import { uploadBytes } from "firebase/storage";
+import { refEqual } from "firebase/firestore";
 
 // const dim = Dimensions.get("window").width;
-
+const URL_Sorage = "https://firebasestorage.googleapis.com/b/bucket/o";
 const initialStateForm = {
   photo: null,
   namePlace: "",
@@ -104,11 +104,16 @@ export const CreatePostsScreen = ({ navigation }) => {
       }
     })();
   }, []);
-  console.log("hasCameraPermission", hasCameraPermission);
-  console.log("hasMediaLibraryPermission", hasMediaLibraryPermission);
-  console.log("hasLocationPermission", hasLocationPermission);
+  // console.log("hasCameraPermission", hasCameraPermission);
+  // console.log("hasMediaLibraryPermission", hasMediaLibraryPermission);
+  // console.log("hasLocationPermission", hasLocationPermission);
 
+  // const imageListRef = ref(storage, "postImg/");
+  // console.log("imageListRef !-!-->", imageListRef);
   useEffect(() => {
+    // listAll(imageListRef)
+    //   .then((r) => getDownloadURL(r.items[0]))
+    //   .then((r) => console.log("listAll(imageListRef)->", r));
     const onChange = () => {
       const width = Dimensions.get("window").width;
       setDimensionR(width);
@@ -119,13 +124,28 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   ///////// Upload foto to Server
   const uploadPhotoToServer = async (photo) => {
+    // const imageListRef = ref(storage, "postImg/");
     const response = await fetch(photo);
     const file = await response.blob();
+    // create ID of photo
     const randomStr = Math.floor((Date.now() + Math.random() * 100).toString());
     // await db.storage().ref(`postImg/${randomStr}`).put(file);
     const refImg = await ref(storage, `postImg/${randomStr}`);
     const data = await uploadBytes(refImg, file);
-    console.log("uploadPhotoToServer-data", data);
+    console.log("uploadPhotoToServer - uploadBytes-data", data);
+    const processedPhoto = await getDownloadURL(
+      // ref(storage, `postImg/${randomStr}`)
+      ref(storage, "postImg/").child(`${randomStr}`)
+    );
+    console.log("processedPhoto !-!-->", processedPhoto);
+
+    console.log("file path and name ->", {
+      path: refImg.fullPath,
+      name: refImg.name,
+      // perent: refImg.parent,
+    });
+
+    // listen for events
   };
   ///////////
 
@@ -143,10 +163,11 @@ export const CreatePostsScreen = ({ navigation }) => {
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
+        // multipul
       };
       let result = await ImagePicker.launchImageLibraryAsync(options);
 
-      console.log(result);
+      // console.log(result);
 
       if (!result.canceled) {
         setPhoto(result.assets[0].uri);
@@ -157,14 +178,14 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const takePhoto = async () => {
     const isCameraPerm = await getCameraPermissionsAsync();
-    console.log("isCameraPerm -!!!!--->cameraRef.isAvailable()", isCameraPerm);
+    // console.log("isCameraPerm -!!!!--->cameraRef.isAvailable()", isCameraPerm);
     if (cameraRef && hasCameraPermission && hasLocationPermission) {
       try {
         const options = { quality: 0.7 };
         const photo = await cameraRef.takePictureAsync(options);
-        console.log("CameraRef->", cameraRef);
+        // console.log("CameraRef->", cameraRef);
 
-        console.log("cameraRef URI ->", photo.uri); //takePictureAsync() - take ref to our photo
+        // console.log("cameraRef URI ->", photo.uri); //takePictureAsync() - take ref to our photo
         let location = await Location.getCurrentPositionAsync({});
         setLocation(location);
         setPhoto(photo.uri);
@@ -183,7 +204,7 @@ export const CreatePostsScreen = ({ navigation }) => {
 
   const toPublish = async () => {
     try {
-      console.log("cameraRef URI ->", photo);
+      // console.log("cameraRef URI ->", photo);
       await uploadPhotoToServer(photo);
       navigation.navigate("PostsScreen", {
         screen: "DefaultScreen",
