@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { db } from "../../firebase/config";
+import { collection, getDocs, onSnapshot, doc } from "firebase/firestore";
 import {
   View,
   Text,
@@ -56,19 +58,59 @@ const Item = ({
     );
   }
 };
+// console.log("route.params -DefaultScreenPosts", route.params);
+// console.log("route.params", { route });
+// DefaultScreenPosts
 export const DefaultScreenPosts = ({ route, navigation }) => {
-  console.log(route.params, "route.params");
-  console.log("route.params", { route });
+  // Whithout on-time listenen
+  // const [posts, setPosts] = useState([]);
+  // console.log("posts --->", posts);
+
+  // const getAllPost = async () => {
+  //   const querySnapshot = await getDocs(collection(db, "posts"));
+  //   // setPosts(querySnapshot.forEach((doc) => ({ ...doc.data(), id: doc.id })));
+  //   querySnapshot.forEach((doc) => {
+  //     setPosts((prev) => [...prev, { ...doc.data(), id: doc.id }]);
+  //     // console.log((doc.id, "=>", doc.data()));
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   getAllPost();
+  // }, []);
+  //   setPosts(doc.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
 
   const [posts, setPosts] = useState([]);
+  console.log("posts --->", posts);
+
+  // const getAllPost = async () => {
+  //   const arrayOfPosts = [];
+  //   onSnapshot(collection(db, "posts"), (docsSnap) => {
+  //     // console.log("docsSnap.docs ->", docsSnap.docs);
+  //     // setPosts[docsSnap.docs.map((doc) => ({ ...doc.data(), id: doc.id }))];
+  //     docsSnap.forEach((doc) => {
+  //       arrayOfPosts.push({ ...doc.data(), id: doc.id });
+  //       // setPosts((prev) => [...prev, { ...doc.data(), id: doc.id }]);
+  //       // console.log("Current data: ", doc.data());
+  //       setPosts[arrayOfPosts];
+  //       console.log("arrayOfPosts =>>", arrayOfPosts);
+  //       console.log("Posts =>>", posts);
+  //     });
+  //   });
+  // };
+
+  // useEffect(() => {
+  //  getAllPost();
+  // }, []);
 
   useEffect(() => {
-    if (route.params) {
-      setPosts((prevState) => [...prevState, route.params]);
-    }
-  }, [route.params]);
-
-  console.log("route.params", { route });
+    const dataOfPosts = onSnapshot(collection(db, "posts"), (docsSnap) => {
+      setPosts(docsSnap.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    });
+    return () => {
+      dataOfPosts();
+    };
+  }, []);
 
   const toMap = ({ coords }) => {
     navigation.navigate("Map", { coords: coords });
@@ -90,6 +132,8 @@ export const DefaultScreenPosts = ({ route, navigation }) => {
       />
     );
   };
+
+  // console.log("posts", posts);
   return (
     <View style={styles.containerP}>
       <FlatList

@@ -218,17 +218,16 @@ export const CreatePostsScreen = ({ navigation }) => {
   // Pablish Data to PostsScreen
   const toPublish = () => {
     try {
-      // console.log("cameraRef URI ->", photo);
       //Upload Post to Server
       uploadPostToServer();
       navigation.navigate("PostsScreen", {
         screen: "DefaultScreen",
-        params: {
-          photo: photo,
-          namePlace: namePlace,
-          location: location,
-          locationPlace: locationPlace,
-        },
+        // params: {
+        //   photo: photo,
+        //   namePlace: namePlace,
+        //   location: location,
+        //   locationPlace: locationPlace,
+        // },
       });
       resetState();
     } catch (error) {
